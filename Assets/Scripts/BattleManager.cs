@@ -248,6 +248,13 @@ public class BattleManager : MonoBehaviour
         }
 
         DestroyCurrentSpell();
+
+        // 전투 종료 체크
+        if (CheckBattleEnd())
+        {
+            return; // 전투가 끝났으면 여기서 종료
+        }
+
         battleUI.SetEndTurnButtonActive(true);
     }
 
@@ -281,6 +288,13 @@ public class BattleManager : MonoBehaviour
         }
 
         DestroyCurrentSpell();
+
+        // 전투 종료 체크
+        if (CheckBattleEnd())
+        {
+            return; // 전투가 끝났으면 여기서 종료
+        }
+
         battleUI.SetEndTurnButtonActive(true);
     }
 
