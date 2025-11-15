@@ -85,8 +85,16 @@ public class GameManager : MonoBehaviour
         switch (stage)
         {
             case 1: return MagicCircle.CirclePattern.Circle;
-            case 2: return MagicCircle.CirclePattern.Pentagram;
-            case 3: return MagicCircle.CirclePattern.Hexagram;
+            case 2: return MagicCircle.CirclePattern.Triangle;
+            case 3: return MagicCircle.CirclePattern.Square;
+            case 4: return MagicCircle.CirclePattern.Pentagram;
+            case 5: return MagicCircle.CirclePattern.Hexagram;
+            case 6: return MagicCircle.CirclePattern.Heptagram;
+            case 7: return MagicCircle.CirclePattern.Octagram;
+            case 8: return MagicCircle.CirclePattern.DoublePentagram;
+            case 9: return MagicCircle.CirclePattern.CrossPattern;
+            case 10: return MagicCircle.CirclePattern.Spiral;
+            case 11: return MagicCircle.CirclePattern.InfinitySymbol;
             default: return MagicCircle.CirclePattern.ComplexRune;
         }
     }
