@@ -11,11 +11,17 @@ public class SlashDetector : MonoBehaviour
     public Color slashColor = new Color(1f, 0.3f, 0.3f, 1f);
     public float trailDuration = 0.3f;
 
+    [Header("Laser Pointer Cursor")]
+    public bool useLaserPointer = true;
+    public Color laserColor = new Color(1f, 0f, 0f, 0.8f);
+    public float laserSize = 0.15f;
+
     [Header("Effects")]
     public GameObject cutEffectPrefab;
 
     private Camera mainCamera;
     private LineRenderer trailRenderer;
+    private LineRenderer laserPointer;
     private List<Vector2> slashPoints = new List<Vector2>();
     private Vector2 lastSlashPoint;
     private bool isSlashing = false;
@@ -25,6 +31,22 @@ public class SlashDetector : MonoBehaviour
     {
         mainCamera = Camera.main;
         SetupTrailRenderer();
+        SetupLaserPointer();
+    }
+
+    void Start()
+    {
+        // 레이저 포인터 사용 시 기본 커서 숨기기
+        if (useLaserPointer)
+        {
+            Cursor.visible = false;
+        }
+    }
+
+    void OnDestroy()
+    {
+        // 씬을 벗어날 때 커서 다시 표시
+        Cursor.visible = true;
     }
 
     void SetupTrailRenderer()
@@ -42,9 +64,49 @@ public class SlashDetector : MonoBehaviour
         trailRenderer.sortingOrder = 10;
     }
 
+    void SetupLaserPointer()
+    {
+        GameObject laserObj = new GameObject("LaserPointer");
+        laserObj.transform.parent = transform;
+        laserPointer = laserObj.AddComponent<LineRenderer>();
+
+        laserPointer.material = new Material(Shader.Find("Sprites/Default"));
+        laserPointer.startColor = laserColor;
+        laserPointer.endColor = laserColor;
+        laserPointer.startWidth = laserSize;
+        laserPointer.endWidth = laserSize;
+        laserPointer.useWorldSpace = true;
+        laserPointer.sortingOrder = 100; // 가장 위에 그리기
+        laserPointer.loop = true;
+
+        // 작은 원형 생성 (8개 점으로 원 만들기)
+        int segments = 12;
+        laserPointer.positionCount = segments;
+
+        float radius = laserSize * 0.5f;
+        for (int i = 0; i < segments; i++)
+        {
+            float angle = i * Mathf.PI * 2f / segments;
+            Vector3 pos = new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0);
+            laserPointer.SetPosition(i, pos);
+        }
+
+        laserPointer.enabled = useLaserPointer;
+    }
+
     void Update()
     {
+        UpdateLaserPointer();
         HandleInput();
+    }
+
+    void UpdateLaserPointer()
+    {
+        if (!useLaserPointer || laserPointer == null) return;
+
+        // 마우스 위치로 레이저 포인터 이동
+        Vector2 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        laserPointer.transform.position = mouseWorldPos;
     }
 
     void HandleInput()
