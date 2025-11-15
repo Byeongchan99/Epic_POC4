@@ -8,6 +8,7 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     [Header("References")]
+    [Tooltip("(Deprecated) Fallback용. 이제 Stage Settings의 Stage Prefabs를 사용합니다.")]
     public MagicCircle magicCirclePrefab;
     public SlashDetector slashDetector;
     public TextMeshProUGUI statusText;
@@ -21,24 +22,10 @@ public class GameManager : MonoBehaviour
     public Vector2 spawnPosition = Vector2.zero;
 
     [Header("Stage Settings")]
-    [Tooltip("각 스테이지의 패턴을 설정합니다. 비어있으면 기본 순서를 사용합니다.")]
-    public MagicCircle.CirclePattern[] stagePatterns = new MagicCircle.CirclePattern[]
-    {
-        MagicCircle.CirclePattern.Circle,
-        MagicCircle.CirclePattern.Triangle,
-        MagicCircle.CirclePattern.Square,
-        MagicCircle.CirclePattern.Pentagram,
-        MagicCircle.CirclePattern.Hexagram,
-        MagicCircle.CirclePattern.Heptagram,
-        MagicCircle.CirclePattern.Octagram,
-        MagicCircle.CirclePattern.DoublePentagram,
-        MagicCircle.CirclePattern.CrossPattern,
-        MagicCircle.CirclePattern.Spiral,
-        MagicCircle.CirclePattern.InfinitySymbol,
-        MagicCircle.CirclePattern.ComplexRune
-    };
+    [Tooltip("각 스테이지에서 사용할 MagicCircle 프리팹을 설정합니다. 배열 크기가 전체 스테이지 개수가 됩니다.")]
+    public MagicCircle[] stagePrefabs;
 
-    private int TotalStages => stagePatterns != null && stagePatterns.Length > 0 ? stagePatterns.Length : 12;
+    private int TotalStages => stagePrefabs != null && stagePrefabs.Length > 0 ? stagePrefabs.Length : 1;
     private MagicCircle currentCircle;
     private float remainingTime;
     private int currentStage = 0;
@@ -84,11 +71,19 @@ public class GameManager : MonoBehaviour
             Destroy(currentCircle.gameObject);
         }
 
-        // 새 마법진 생성
-        currentCircle = Instantiate(magicCirclePrefab, spawnPosition, Quaternion.identity);
+        // 스테이지에 맞는 프리팹 가져오기
+        MagicCircle prefabToUse = GetPrefabForStage(currentStage);
 
-        // 난이도에 따라 패턴 변경
-        currentCircle.pattern = GetPatternForStage(currentStage);
+        if (prefabToUse == null)
+        {
+            Debug.LogError($"Stage {currentStage}: 프리팹이 할당되지 않았습니다!");
+            return;
+        }
+
+        // 새 마법진 생성 (프리팹의 모든 설정 그대로 사용)
+        currentCircle = Instantiate(prefabToUse, spawnPosition, Quaternion.identity);
+
+        // drawDuration만 GameManager의 castTime으로 오버라이드
         currentCircle.drawDuration = castTime;
         currentCircle.StartDrawing();
 
@@ -99,21 +94,27 @@ public class GameManager : MonoBehaviour
         }
 
         UpdateUI();
-        Debug.Log($"Stage {currentStage} started!");
+        Debug.Log($"Stage {currentStage} started with prefab: {prefabToUse.name}");
     }
 
-    MagicCircle.CirclePattern GetPatternForStage(int stage)
+    MagicCircle GetPrefabForStage(int stage)
     {
         // 스테이지는 1부터 시작하므로 배열 인덱스는 stage - 1
         int index = stage - 1;
 
-        if (stagePatterns != null && index >= 0 && index < stagePatterns.Length)
+        if (stagePrefabs != null && index >= 0 && index < stagePrefabs.Length)
         {
-            return stagePatterns[index];
+            return stagePrefabs[index];
         }
 
-        // 기본값 (배열이 없거나 범위를 벗어나면)
-        return MagicCircle.CirclePattern.Circle;
+        // Fallback: 기본 프리팹 사용
+        if (magicCirclePrefab != null)
+        {
+            Debug.LogWarning($"Stage {stage}: stagePrefabs가 비어있어 fallback 프리팹 사용");
+            return magicCirclePrefab;
+        }
+
+        return null;
     }
 
     void OnPlayerWin()

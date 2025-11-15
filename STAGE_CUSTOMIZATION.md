@@ -1,10 +1,11 @@
-# 스테이지 커스터마이징 가이드
+# 스테이지 커스터마이징 가이드 (프리팹 방식)
 
 ## 🎮 개요
 
-Inspector에서 **각 스테이지의 패턴을 자유롭게 설정**할 수 있습니다!
+Inspector에서 **각 스테이지에 사용할 MagicCircle 프리팹을 직접 할당**할 수 있습니다!
+각 프리팹마다 다른 설정(패턴, 색상, 선 두께, 약점 비율 등)을 적용할 수 있어 훨씬 더 유연합니다.
 
-## 📝 설정 방법
+## 📝 기본 설정 방법
 
 ### 1. GameManager 오브젝트 선택
 - Hierarchy에서 **GameManager** 선택
@@ -14,191 +15,342 @@ Inspector에서 **각 스테이지의 패턴을 자유롭게 설정**할 수 있
 ```
 Inspector > GameManager
 └── Stage Settings
-    └── Stage Patterns (Array)
+    └── Stage Prefabs (Array)
         ├── Size: 12 (스테이지 개수)
-        ├── Element 0: Circle
-        ├── Element 1: Triangle
-        ├── Element 2: Square
+        ├── Element 0: [MagicCircle 프리팹을 드래그 앤 드롭]
+        ├── Element 1: [MagicCircle 프리팹을 드래그 앤 드롭]
+        ├── Element 2: [MagicCircle 프리팹을 드래그 앤 드롭]
         └── ...
 ```
 
-### 3. 패턴 변경하기
-각 Element의 드롭다운을 클릭하여 원하는 패턴 선택:
+### 3. 프리팹 할당하기
+1. **Size** 값 설정 (원하는 스테이지 개수)
+2. 각 **Element**에 프리팹 드래그 앤 드롭
+   - Project 창에서 `Assets/Prefabs/MagicCircle.prefab` 찾기
+   - Inspector의 Element 슬롯에 드래그 앤 드롭
 
-**사용 가능한 패턴:**
-- **Circle** - 원형 (32개 선분)
-- **Triangle** - 삼각형 (3개 선분)
-- **Square** - 사각형 (4개 선분)
-- **Pentagram** - 오각별 (5개 선분)
-- **Hexagram** - 육각별 (13개 선분)
-- **Heptagram** - 칠각별 (7개 선분)
-- **Octagram** - 팔각별 (8개 선분)
-- **DoublePentagram** - 이중 오각별 (11개 선분)
-- **CrossPattern** - 십자가 패턴 (44개 선분)
-- **Spiral** - 나선형 (64개 선분)
-- **InfinitySymbol** - 무한대 기호 (64개 선분)
-- **ComplexRune** - 복잡한 룬 (다양한 패턴 조합)
+## 🎨 프리팹별 커스터마이징
 
-## 🎯 예시 설정
+### 프리팹 만드는 법
 
-### 기본 설정 (현재)
+#### 방법 1: 기존 프리팹 복제
+1. Project 창에서 `Assets/Prefabs/MagicCircle.prefab` 우클릭
+2. **Duplicate** 선택
+3. 이름 변경 (예: `MagicCircle_Stage1.prefab`)
+4. 프리팹 선택 > Inspector에서 설정 변경
+
+#### 방법 2: 새로 만들기
+1. Hierarchy에서 빈 GameObject 생성
+2. **MagicCircle** 컴포넌트 추가
+3. Inspector에서 원하는 값 설정
+4. Project 창의 `Assets/Prefabs` 폴더로 드래그 앤 드롭
+
+### 프리팹에서 설정 가능한 값들
+
+각 프리팹마다 다르게 설정할 수 있는 항목:
+
 ```
-Stage 1: Circle
-Stage 2: Triangle
-Stage 3: Square
-Stage 4: Pentagram
-Stage 5: Hexagram
-Stage 6: Heptagram
-Stage 7: Octagram
-Stage 8: DoublePentagram
-Stage 9: CrossPattern
-Stage 10: Spiral
-Stage 11: InfinitySymbol
-Stage 12: ComplexRune
+🎨 Visual Settings
+├── Pattern: 패턴 선택 (Circle, Triangle, Square, Pentagram 등)
+├── Circle Color: 마법진 색상 (기본: 보라색)
+├── Line Width: 선 두께 (기본: 0.1)
+├── Broken Color: 끊어진 선분 색상 (기본: 회색)
+├── Weakpoint Color: 약점 색상 (기본: 빨강)
+└── Weakpoint Ratio: 약점 비율 (기본: 0.3 = 30%)
+
+⚙️ Generation Settings
+├── Radius: 마법진 크기 (기본: 2.0)
+└── Draw Duration: 그려지는 시간 (GameManager에서 오버라이드됨)
 ```
-
-### 난이도 점진적 증가
-```
-Stage 1: Triangle (쉬움 - 선분 3개)
-Stage 2: Square (쉬움 - 선분 4개)
-Stage 3: Pentagram (보통 - 선분 5개)
-Stage 4: Hexagram (보통 - 선분 13개)
-Stage 5: Heptagram (보통 - 선분 7개)
-Stage 6: Octagram (보통 - 선분 8개)
-Stage 7: DoublePentagram (어려움 - 선분 11개)
-Stage 8: Circle (어려움 - 선분 32개)
-Stage 9: CrossPattern (매우 어려움 - 선분 44개)
-Stage 10: Spiral (매우 어려움 - 선분 64개)
-Stage 11: InfinitySymbol (매우 어려움 - 선분 64개)
-Stage 12: ComplexRune (최고 난이도)
-```
-
-### 테마별 배치
-```
-Stage 1-3: 기본 도형 (Circle, Triangle, Square)
-Stage 4-6: 별 모양 (Pentagram, Hexagram, Heptagram)
-Stage 7-9: 복잡한 별 (Octagram, DoublePentagram, CrossPattern)
-Stage 10-12: 특수 패턴 (Spiral, InfinitySymbol, ComplexRune)
-```
-
-### 같은 패턴 반복 (특정 패턴 연습)
-```
-Stage 1-4: Pentagram (오각별 마스터)
-Stage 5-8: Spiral (나선 마스터)
-Stage 9-12: ComplexRune (최종 보스)
-```
-
-## 🔧 스테이지 개수 변경하기
-
-### 더 많은 스테이지 (예: 20개)
-1. Inspector > GameManager > Stage Settings
-2. **Size** 값을 `20`으로 변경
-3. Element 12~19에 원하는 패턴 할당
-
-### 더 적은 스테이지 (예: 5개)
-1. Inspector > GameManager > Stage Settings
-2. **Size** 값을 `5`로 변경
-3. Element 0~4만 남음 (원하는 패턴 할당)
-
-**자동 반영:**
-- 배열 크기에 따라 전체 스테이지 개수 자동 조정
-- UI에 "Stage X/Y" 형식으로 자동 표시
-
-## 💡 난이도 조절 팁
-
-### 쉽게 만들기
-1. **적은 선분 패턴 사용**: Triangle, Square, Pentagram
-2. **Cast Time 증가**: GameManager > Game Settings > Cast Time을 `5초`로
-3. **Weakpoint Ratio 감소**: MagicCircle Prefab > Weakpoint Ratio를 `0.1`로
-
-### 어렵게 만들기
-1. **많은 선분 패턴 사용**: Circle, Spiral, InfinitySymbol, CrossPattern
-2. **Cast Time 감소**: GameManager > Game Settings > Cast Time을 `2초`로
-3. **Weakpoint Ratio 증가**: MagicCircle Prefab > Weakpoint Ratio를 `0.5`로
-
-### 점진적 난이도 상승
-- 초반 스테이지: 적은 선분 + 긴 시간 + 적은 약점
-- 중반 스테이지: 중간 선분 + 보통 시간 + 보통 약점
-- 후반 스테이지: 많은 선분 + 짧은 시간 + 많은 약점
-
-## 🎨 패턴 특성
-
-### 초보자 친화적
-- **Triangle** (3개): 가장 쉬움
-- **Square** (4개): 매우 쉬움
-- **Pentagram** (5개): 쉬움
-
-### 중급자용
-- **Hexagram** (13개): 보통
-- **Heptagram** (7개): 보통
-- **Octagram** (8개): 보통
-- **DoublePentagram** (11개): 보통-어려움
-
-### 고급자용
-- **Circle** (32개): 어려움 (많은 선분)
-- **Spiral** (64개): 매우 어려움 (밀집된 선분)
-- **InfinitySymbol** (64개): 매우 어려움 (복잡한 형태)
-- **CrossPattern** (44개): 매우 어려움 (여러 방향)
-- **ComplexRune**: 최고 난이도 (모든 요소 결합)
 
 ## 🚀 실전 예시
 
-### 빠른 테스트 모드 (3스테이지)
+### 예시 1: 단계별 난이도 증가 (12 스테이지)
+
+#### 프리팹 12개 생성
+1. `MagicCircle_Easy1.prefab` ~ `MagicCircle_Hard4.prefab` 생성
+
+#### 각 프리팹 설정
 ```
-Size: 3
-Stage 1: Triangle
-Stage 2: Pentagram
-Stage 3: Circle
+Stage 1-3 (쉬움):
+- Pattern: Triangle, Square, Pentagram
+- Weakpoint Ratio: 0.2 (20%)
+- Line Width: 0.12 (두껍게)
+- Circle Color: 밝은 색 (0.5, 0.5, 1, 1)
+
+Stage 4-6 (보통):
+- Pattern: Hexagram, Heptagram, Octagram
+- Weakpoint Ratio: 0.3 (30%)
+- Line Width: 0.1
+- Circle Color: 보통 색 (0.5, 0.2, 1, 1)
+
+Stage 7-9 (어려움):
+- Pattern: DoublePentagram, CrossPattern, Spiral
+- Weakpoint Ratio: 0.4 (40%)
+- Line Width: 0.08 (얇게)
+- Circle Color: 어두운 색 (0.4, 0.1, 0.8, 1)
+
+Stage 10-12 (매우 어려움):
+- Pattern: InfinitySymbol, ComplexRune, Circle
+- Weakpoint Ratio: 0.5 (50%)
+- Line Width: 0.06 (매우 얇게)
+- Circle Color: 거의 검정 (0.3, 0.1, 0.5, 1)
+- Radius: 2.5 (더 크게)
 ```
 
-### 튜토리얼 모드 (5스테이지)
+#### GameManager 설정
 ```
-Size: 5
-Stage 1: Triangle (기본 조작 배우기)
-Stage 2: Square (감 잡기)
-Stage 3: Pentagram (약점 찾기 연습)
-Stage 4: Hexagram (복잡한 패턴 체험)
-Stage 5: DoublePentagram (최종 시험)
-```
-
-### 엔드리스 모드 느낌 (30스테이지)
-```
-Size: 30
-Stage 1-5: 기본 패턴 반복
-Stage 6-15: 중급 패턴 믹스
-Stage 16-30: 고급 패턴 랜덤 배치
-```
-
-## 📋 체크리스트
-
-변경 후 확인사항:
-- [ ] Inspector에서 패턴 배열이 제대로 표시되는가?
-- [ ] Play 모드에서 설정한 패턴대로 나오는가?
-- [ ] 스테이지 개수가 UI에 정확히 표시되는가?
-- [ ] 마지막 스테이지 클리어 시 축하 화면이 나오는가?
-
-## 🔄 기본값으로 되돌리기
-
-Inspector에서 GameManager 컴포넌트 우클릭 > **Reset**
-(주의: 다른 설정도 초기화됨!)
-
-또는 수동으로:
-```
+Stage Settings > Stage Prefabs:
 Size: 12
-Element 0: Circle
-Element 1: Triangle
-Element 2: Square
-Element 3: Pentagram
-Element 4: Hexagram
-Element 5: Heptagram
-Element 6: Octagram
-Element 7: DoublePentagram
-Element 8: CrossPattern
-Element 9: Spiral
-Element 10: InfinitySymbol
-Element 11: ComplexRune
+Element 0: MagicCircle_Easy1
+Element 1: MagicCircle_Easy2
+Element 2: MagicCircle_Easy3
+Element 3: MagicCircle_Normal1
+...
+Element 11: MagicCircle_VeryHard4
 ```
+
+### 예시 2: 색상 테마별 스테이지 (9 스테이지)
+
+#### 프리팹 9개 생성
+```
+빨강 테마 (Stage 1-3):
+- Circle Color: (1, 0.2, 0.2, 1)
+- Weakpoint Color: (1, 1, 0.2, 1) - 노랑
+- Pattern: Circle, Triangle, Square
+
+초록 테마 (Stage 4-6):
+- Circle Color: (0.2, 1, 0.2, 1)
+- Weakpoint Color: (0.2, 0.2, 1, 1) - 파랑
+- Pattern: Pentagram, Hexagram, Heptagram
+
+파랑 테마 (Stage 7-9):
+- Circle Color: (0.2, 0.2, 1, 1)
+- Weakpoint Color: (1, 0.2, 1, 1) - 보라
+- Pattern: Octagram, Spiral, ComplexRune
+```
+
+### 예시 3: 빠른 테스트 (3 스테이지)
+
+#### 프리팹 3개만 생성
+```
+Stage 1: MagicCircle_Test_Easy
+- Pattern: Triangle
+- Weakpoint Ratio: 0.1 (매우 쉬움)
+
+Stage 2: MagicCircle_Test_Normal
+- Pattern: Pentagram
+- Weakpoint Ratio: 0.3
+
+Stage 3: MagicCircle_Test_Hard
+- Pattern: Spiral
+- Weakpoint Ratio: 0.5
+```
+
+#### GameManager 설정
+```
+Stage Settings > Stage Prefabs:
+Size: 3
+Element 0: MagicCircle_Test_Easy
+Element 1: MagicCircle_Test_Normal
+Element 2: MagicCircle_Test_Hard
+```
+
+### 예시 4: 같은 프리팹 반복 (특정 패턴 연습)
+
+```
+Stage Settings > Stage Prefabs:
+Size: 5
+Element 0-4: 모두 같은 프리팹 (MagicCircle_Pentagram)
+```
+
+같은 패턴을 5번 연속으로 플레이 (오각별 마스터 모드!)
+
+## 🔧 고급 커스터마이징
+
+### 난이도 조절 팁
+
+#### 쉽게 만들기
+1. **Weakpoint Ratio 감소**: `0.1` ~ `0.2`
+2. **Line Width 증가**: `0.15` ~ `0.2` (찾기 쉬움)
+3. **Circle Color 밝게**: `(0.7, 0.5, 1, 1)`
+4. **적은 선분 패턴**: Triangle, Square, Pentagram
+5. **Radius 감소**: `1.5` (작은 마법진)
+
+#### 어렵게 만들기
+1. **Weakpoint Ratio 증가**: `0.4` ~ `0.5`
+2. **Line Width 감소**: `0.05` ~ `0.08` (찾기 어려움)
+3. **Circle Color 어둡게**: `(0.3, 0.1, 0.5, 0.8)`
+4. **많은 선분 패턴**: Spiral, InfinitySymbol, ComplexRune
+5. **Radius 증가**: `3.0` (큰 마법진)
+
+### 시각적 다양성
+
+#### 무지개 스테이지
+```
+Stage 1: Circle Color (1, 0, 0, 1) - 빨강
+Stage 2: Circle Color (1, 0.5, 0, 1) - 주황
+Stage 3: Circle Color (1, 1, 0, 1) - 노랑
+Stage 4: Circle Color (0, 1, 0, 1) - 초록
+Stage 5: Circle Color (0, 0, 1, 1) - 파랑
+Stage 6: Circle Color (0.5, 0, 1, 1) - 남색
+Stage 7: Circle Color (1, 0, 1, 1) - 보라
+```
+
+#### 크기 변화 스테이지
+```
+Stage 1: Radius 1.0 (작음)
+Stage 2: Radius 1.5
+Stage 3: Radius 2.0 (보통)
+Stage 4: Radius 2.5
+Stage 5: Radius 3.0 (큼)
+```
+
+## 📋 프리팹 관리 팁
+
+### 폴더 구조 추천
+```
+Assets/
+└── Prefabs/
+    ├── MagicCircle.prefab (기본)
+    ├── Stages/
+    │   ├── Easy/
+    │   │   ├── MagicCircle_Easy1.prefab
+    │   │   ├── MagicCircle_Easy2.prefab
+    │   │   └── MagicCircle_Easy3.prefab
+    │   ├── Normal/
+    │   │   ├── MagicCircle_Normal1.prefab
+    │   │   └── ...
+    │   ├── Hard/
+    │   │   └── ...
+    │   └── VeryHard/
+    │       └── ...
+    └── Themed/
+        ├── RedTheme_Stage1.prefab
+        ├── GreenTheme_Stage1.prefab
+        └── BlueTheme_Stage1.prefab
+```
+
+### 네이밍 컨벤션
+```
+MagicCircle_[난이도]_[스테이지번호].prefab
+예: MagicCircle_Easy_01.prefab
+
+또는
+
+MagicCircle_[패턴이름]_[바리에이션].prefab
+예: MagicCircle_Pentagram_Red.prefab
+```
+
+## 🎯 패턴별 추천 설정
+
+### Circle (원형 - 32개 선분)
+```
+Weakpoint Ratio: 0.3-0.4 (약간 어려움)
+Line Width: 0.08
+난이도: 중상
+```
+
+### Triangle (삼각형 - 3개 선분)
+```
+Weakpoint Ratio: 0.2 (매우 쉬움)
+Line Width: 0.15
+난이도: 하
+```
+
+### Pentagram (오각별 - 5개 선분)
+```
+Weakpoint Ratio: 0.2-0.3
+Line Width: 0.12
+난이도: 중하
+```
+
+### Spiral (나선 - 64개 선분)
+```
+Weakpoint Ratio: 0.4-0.5 (어려움)
+Line Width: 0.06
+난이도: 상
+```
+
+### ComplexRune (복잡한 룬)
+```
+Weakpoint Ratio: 0.5 (매우 어려움)
+Line Width: 0.05
+난이도: 최상
+```
+
+## ⚠️ 주의사항
+
+### 프리팭 수정 시 영향
+- 프리팹을 수정하면 해당 프리팹을 사용하는 **모든 스테이지**에 영향
+- 특정 스테이지만 바꾸려면 **프리팹을 복제**해서 사용
+
+### 필수 체크리스트
+- [ ] 모든 Element에 프리팹이 할당되어 있는가?
+- [ ] 프리팹에 MagicCircle 컴포넌트가 있는가?
+- [ ] 프리팹의 Pattern이 올바르게 설정되어 있는가?
+- [ ] 색상이 배경과 구분되는가?
+- [ ] Weakpoint Ratio가 0.1 ~ 0.5 범위인가?
+
+### 디버깅
+콘솔에 로그 확인:
+```
+"Stage X started with prefab: [프리팹 이름]"
+"Stage X: 프리팹이 할당되지 않았습니다!" (에러)
+```
+
+## 🔄 기본 설정으로 돌아가기
+
+### 옵션 1: 단일 프리팹 사용
+```
+Stage Settings > Stage Prefabs:
+Size: 1
+Element 0: MagicCircle (기본 프리팹)
+```
+→ 1스테이지만 무한 반복
+
+### 옵션 2: Fallback 사용
+```
+Stage Settings > Stage Prefabs:
+Size: 0 (비워두기)
+```
+→ GameManager의 magicCirclePrefab 사용 (1스테이지만)
+
+## 💡 창의적 활용 예시
+
+### 보스 스테이지
+```
+Stage 1-9: 일반 패턴 (쉬움~어려움)
+Stage 10:
+  - Pattern: ComplexRune
+  - Radius: 3.5 (매우 크게)
+  - Weakpoint Ratio: 0.5
+  - Circle Color: (1, 0, 0, 1) - 빨강 (보스 느낌)
+  - Line Width: 0.05
+```
+
+### 시간 제한 챌린지
+```
+GameManager > Cast Time: 2초 (짧게)
+모든 프리팹 Weakpoint Ratio: 0.2 (쉽게)
+→ 빠른 반응 속도 테스트
+```
+
+### 정확도 챌린지
+```
+GameManager > Cast Time: 10초 (길게)
+모든 프리팹 Weakpoint Ratio: 0.5 (많게)
+모든 프리팹 Line Width: 0.05 (얇게)
+→ 정확한 조준 능력 테스트
+```
+
+## 📚 관련 문서
+
+- [SETUP_GUIDE.md](SETUP_GUIDE.md) - 초기 세팅 방법
+- [PATTERNS_GUIDE.md](PATTERNS_GUIDE.md) - 12가지 패턴 상세 설명
+- [WEAKPOINT_SYSTEM.md](WEAKPOINT_SYSTEM.md) - 약점 시스템 설명
+- [README.md](README.md) - 프로젝트 개요
 
 ---
 
-이제 스테이지를 **완전히 자유롭게** 커스터마이징할 수 있습니다! 🎉
+이제 프리팹 방식으로 **무한한 커스터마이징**이 가능합니다! 🎉
