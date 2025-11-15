@@ -52,7 +52,7 @@ MonoBehaviour:
   stageTimeLimit: 8
   brokenColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
   weakpointColor: {r: 1, g: 0.3, b: 0.3, a: 1}
-  weakpointRatio: 0.1
+  weakpointRatio: 0.2
   weakpointDistribution: 0
   customWeakpointIndices: 
-  maxSegmentLength: 0.3
+  maxSegmentLength: 0.6

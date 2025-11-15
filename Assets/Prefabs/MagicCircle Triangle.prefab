@@ -54,5 +54,5 @@ MonoBehaviour:
   weakpointColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   weakpointRatio: 0.1
   weakpointDistribution: 4
-  customWeakpointIndices: 08000000190000002900000031000000
-  maxSegmentLength: 0.3
+  customWeakpointIndices: 02000000090000000e00000014000000
+  maxSegmentLength: 0.7

@@ -44,15 +44,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawDuration: 8
+  drawDuration: 7
   circleColor: {r: 0.48252353, g: 1, b: 0.19999999, a: 1}
   lineWidth: 0.1
   pattern: 7
   radius: 4
-  stageTimeLimit: 10
+  stageTimeLimit: 9
   brokenColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
   weakpointColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   weakpointRatio: 0.1
   weakpointDistribution: 4
-  customWeakpointIndices: 080000001e0000002d0000003d000000560000006c0000007d00000095000000
-  maxSegmentLength: 0.3
+  customWeakpointIndices: 10000000190000001f0000002d0000003d0000004900000053000000
+  maxSegmentLength: 0.7
