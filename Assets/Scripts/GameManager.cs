@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour
 
         if (statusText != null)
         {
-            statusText.text = $"STAGE {currentStage} CLEAR! +{stageScore} points";
+            statusText.text = $"스테이지 {currentStage} 클리어! +{stageScore}점";
             statusText.color = Color.green;
         }
 
@@ -168,7 +168,7 @@ public class GameManager : MonoBehaviour
 
         if (statusText != null)
         {
-            statusText.text = $"WRONG CUT! Don't cut purple lines!";
+            statusText.text = $"다른 마력선을 자르지 마세요!";
             statusText.color = Color.red;
         }
 
@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviour
 
         if (statusText != null)
         {
-            statusText.text = $"TIME UP! Retry...";
+            statusText.text = $"시간 초과!";
             statusText.color = Color.red;
         }
 
@@ -221,14 +221,14 @@ public class GameManager : MonoBehaviour
     {
         if (statusText != null)
         {
-            statusText.text = $"ALL STAGES CLEAR!\nFinal Score: {totalScore}";
+            statusText.text = $"모든 스테이지 클리어!\n최종 점수: {totalScore}";
             statusText.color = Color.yellow;
             statusText.fontSize = 40;
         }
 
         if (timerText != null)
         {
-            timerText.text = "CONGRATULATIONS!";
+            timerText.text = "축하합니다!";
         }
 
         Debug.Log($"All stages cleared! Final Score: {totalScore}");
@@ -241,19 +241,19 @@ public class GameManager : MonoBehaviour
     {
         if (timerText != null)
         {
-            timerText.text = $"Time: {remainingTime:F1}s";
+            timerText.text = $"남은 시간: {remainingTime:F1}s";
         }
 
         if (scoreText != null)
         {
-            scoreText.text = $"Score: {totalScore}";
+            scoreText.text = $"점수: {totalScore}";
         }
 
         if (statusText != null && isGameActive)
         {
             int brokenWeakpoints = currentCircle != null ? currentCircle.GetBrokenWeakpointCount() : 0;
             int totalWeakpoints = currentCircle != null ? currentCircle.GetTotalWeakpointCount() : 0;
-            statusText.text = $"Stage {currentStage}/{TotalStages} - Destroy {brokenWeakpoints}/{totalWeakpoints} weakpoints!";
+            statusText.text = $"스테이지 {currentStage}/{TotalStages} - 잘라야 할 마력선의 개쉬: {brokenWeakpoints}/{totalWeakpoints}";
             statusText.color = Color.white;
             statusText.fontSize = 32; // 기본 크기로 복원
         }

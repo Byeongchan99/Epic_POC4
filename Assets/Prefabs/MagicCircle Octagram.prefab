@@ -45,12 +45,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawDuration: 5
-  circleColor: {r: 0.5, g: 0.2, b: 1, a: 1}
+  circleColor: {r: 0.19999999, g: 0.97077143, b: 1, a: 1}
   lineWidth: 0.1
   pattern: 6
+  radius: 3
+  stageTimeLimit: 7
   brokenColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
   weakpointColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   weakpointRatio: 0.2
   weakpointDistribution: 4
-  customWeakpointIndices: 01000000040000000a0000000d0000001200000016000000190000001c000000
+  customWeakpointIndices: 03000000130000001b0000002700000033000000
   maxSegmentLength: 0.3
