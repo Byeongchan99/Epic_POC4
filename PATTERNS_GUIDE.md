@@ -178,3 +178,52 @@ void GenerateMyPattern(float radius)
 5. **Inspector에서 여러 색상 테스트** (2분)
 
 **총 5분이면 모든 핵심 경험 검증 가능!**
+
+---
+
+## ✨ 시각적 피드백 시스템 (NEW!)
+
+### 선분별 독립 렌더링
+이제 마법진의 각 선분(획)이 **별도의 LineRenderer 오브젝트**로 관리됩니다!
+
+**개선 사항:**
+- ✅ 각 선분마다 독립적인 GameObject + LineRenderer
+- ✅ 끊어진 선분을 정확히 시각화
+- ✅ 부드러운 페이드 아웃 애니메이션
+- ✅ 어느 부분이 끊어졌는지 명확히 확인
+
+### Broken Color 설정
+**MagicCircle Prefab** → Inspector:
+- **Broken Color**: 끊어진 선분의 색상
+  - 기본값: 어두운 회색 (투명도 50%)
+  - 추천: 빨간색 (경고), 검은색 (소멸), 하얀색 (반짝)
+
+**작동 방식:**
+1. 플레이어가 선분을 자르면
+2. 해당 선분의 색상이 `Broken Color`로 변경
+3. 0.5초간 페이드 아웃
+4. 완전히 사라짐
+
+### 시각적 효과 커스터마이징
+```
+Inspector > MagicCircle Prefab
+├── Circle Color: 마법진 기본 색상
+└── Broken Color: 끊어진 부분 색상
+```
+
+**예시 조합:**
+- **고급스러운**: 보라색 → 금색 (끊어짐)
+- **위험한**: 빨간색 → 검은색 (끊어짐)
+- **신비로운**: 청록색 → 하얀색 (끊어짐)
+
+### Hierarchy 구조
+Play 모드에서 확인:
+```
+MagicCircle
+├── Segment_0 (LineRenderer)
+├── Segment_1 (LineRenderer)
+├── Segment_2 (LineRenderer)
+└── ...
+```
+
+각 Segment를 개별적으로 선택하여 실시간 확인 가능!

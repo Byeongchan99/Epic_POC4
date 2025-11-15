@@ -14,7 +14,10 @@ public class MagicCircle : MonoBehaviour
     [Header("Pattern")]
     public CirclePattern pattern = CirclePattern.Pentagram;
 
-    private LineRenderer lineRenderer;
+    [Header("Visual Feedback")]
+    public Color brokenColor = new Color(0.3f, 0.3f, 0.3f, 0.5f); // 끊어진 선분 색상
+
+    private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private List<LineSegment> segments = new List<LineSegment>();
     private float drawProgress = 0f;
     private bool isDrawing = false;
@@ -42,20 +45,48 @@ public class MagicCircle : MonoBehaviour
 
     void Awake()
     {
-        SetupLineRenderer();
         GeneratePattern();
+        CreateLineRenderers();
     }
 
-    void SetupLineRenderer()
+    /// <summary>
+    /// 각 선분마다 별도의 LineRenderer 생성
+    /// </summary>
+    void CreateLineRenderers()
     {
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.startColor = circleColor;
-        lineRenderer.endColor = circleColor;
-        lineRenderer.startWidth = lineWidth;
-        lineRenderer.endWidth = lineWidth;
-        lineRenderer.useWorldSpace = true;
-        lineRenderer.sortingOrder = 1;
+        // 기존 LineRenderer들 정리
+        foreach (var lr in lineRenderers)
+        {
+            if (lr != null) Destroy(lr.gameObject);
+        }
+        lineRenderers.Clear();
+
+        // 각 선분마다 자식 GameObject + LineRenderer 생성
+        for (int i = 0; i < segments.Count; i++)
+        {
+            GameObject segmentObj = new GameObject($"Segment_{i}");
+            segmentObj.transform.parent = transform;
+            segmentObj.transform.localPosition = Vector3.zero;
+
+            LineRenderer lr = segmentObj.AddComponent<LineRenderer>();
+            lr.material = new Material(Shader.Find("Sprites/Default"));
+            lr.startColor = circleColor;
+            lr.endColor = circleColor;
+            lr.startWidth = lineWidth;
+            lr.endWidth = lineWidth;
+            lr.useWorldSpace = true;
+            lr.sortingOrder = 1;
+            lr.positionCount = 2;
+
+            // 선분의 시작점과 끝점 설정
+            lr.SetPosition(0, segments[i].start);
+            lr.SetPosition(1, segments[i].end);
+
+            // 처음에는 비활성화 (그리기 애니메이션을 위해)
+            lr.enabled = false;
+
+            lineRenderers.Add(lr);
+        }
     }
 
     void GeneratePattern()
@@ -327,25 +358,35 @@ public class MagicCircle : MonoBehaviour
     void UpdateVisual()
     {
         float progress = Mathf.Clamp01(DrawProgress);
-        int pointsToShow = Mathf.FloorToInt(patternPoints.Count * progress);
+        int segmentsToShow = Mathf.FloorToInt(lineRenderers.Count * progress);
 
-        lineRenderer.positionCount = pointsToShow;
-        for (int i = 0; i < pointsToShow; i++)
+        // 완료된 선분들은 완전히 표시
+        for (int i = 0; i < segmentsToShow && i < lineRenderers.Count; i++)
         {
-            lineRenderer.SetPosition(i, patternPoints[i] + (Vector2)transform.position);
+            if (!lineRenderers[i].enabled)
+            {
+                lineRenderers[i].enabled = true;
+            }
         }
 
-        // 마지막 점은 부드럽게 그려지기
-        if (pointsToShow > 0 && pointsToShow < patternPoints.Count)
+        // 현재 그려지는 중인 선분 (부드러운 애니메이션)
+        if (segmentsToShow < lineRenderers.Count)
         {
-            float t = (patternPoints.Count * progress) - pointsToShow;
-            Vector2 currentPoint = Vector2.Lerp(
-                patternPoints[pointsToShow - 1],
-                patternPoints[pointsToShow],
-                t
-            );
-            lineRenderer.positionCount++;
-            lineRenderer.SetPosition(pointsToShow, currentPoint + (Vector2)transform.position);
+            float t = (lineRenderers.Count * progress) - segmentsToShow;
+            LineRenderer currentLR = lineRenderers[segmentsToShow];
+
+            if (!currentLR.enabled)
+            {
+                currentLR.enabled = true;
+            }
+
+            // 선분의 끝점을 lerp로 부드럽게 그리기
+            Vector2 start = segments[segmentsToShow].start;
+            Vector2 end = segments[segmentsToShow].end;
+            Vector2 currentEnd = Vector2.Lerp(start, end, t);
+
+            currentLR.SetPosition(0, start);
+            currentLR.SetPosition(1, currentEnd);
         }
     }
 
@@ -357,9 +398,48 @@ public class MagicCircle : MonoBehaviour
         if (index >= 0 && index < segments.Count && !segments[index].isBroken)
         {
             segments[index].isBroken = true;
+
+            // 해당 선분의 LineRenderer 시각적 변경
+            if (index < lineRenderers.Count && lineRenderers[index] != null)
+            {
+                LineRenderer lr = lineRenderers[index];
+
+                // 색상을 어둡게 변경 (끊어진 표시)
+                lr.startColor = brokenColor;
+                lr.endColor = brokenColor;
+
+                // 페이드 아웃 애니메이션
+                StartCoroutine(FadeOutSegment(lr));
+            }
+
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// 끊어진 선분 페이드 아웃
+    /// </summary>
+    System.Collections.IEnumerator FadeOutSegment(LineRenderer lr)
+    {
+        float duration = 0.5f;
+        float elapsed = 0f;
+        Color startColor = brokenColor;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(startColor.a, 0f, elapsed / duration);
+
+            Color currentColor = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            lr.startColor = currentColor;
+            lr.endColor = currentColor;
+
+            yield return null;
+        }
+
+        // 완전히 투명해지면 비활성화
+        lr.enabled = false;
     }
 
     /// <summary>
