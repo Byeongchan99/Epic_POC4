@@ -26,6 +26,9 @@ public class BattleManager : MonoBehaviour
     [Header("UI")]
     public BattleUI battleUI;
 
+    [Header("Slash Detector")]
+    public SlashDetector slashDetector;
+
     private BattleState currentState = BattleState.PlayerTurn;
     private MagicCircle currentSpell;
     private bool isProcessingSpell = false;
@@ -150,6 +153,12 @@ public class BattleManager : MonoBehaviour
         MagicCircle prefab = defenseSpellPrefabs[Random.Range(0, defenseSpellPrefabs.Count)];
         currentSpell = Instantiate(prefab, spellSpawnPosition, Quaternion.identity);
 
+        // SlashDetector에 타겟 설정
+        if (slashDetector != null)
+        {
+            slashDetector.SetTarget(currentSpell);
+        }
+
         // 마법진 그리기 시작
         currentSpell.StartDrawing();
 
@@ -174,6 +183,12 @@ public class BattleManager : MonoBehaviour
         // 랜덤으로 공격 마법 선택
         MagicCircle prefab = attackSpellPrefabs[Random.Range(0, attackSpellPrefabs.Count)];
         currentSpell = Instantiate(prefab, spellSpawnPosition, Quaternion.identity);
+
+        // SlashDetector에 타겟 설정
+        if (slashDetector != null)
+        {
+            slashDetector.SetTarget(currentSpell);
+        }
 
         // 마법진 그리기 시작
         currentSpell.StartDrawing();
@@ -289,6 +304,12 @@ public class BattleManager : MonoBehaviour
         {
             Destroy(currentSpell.gameObject);
             currentSpell = null;
+        }
+
+        // SlashDetector 타겟도 초기화
+        if (slashDetector != null)
+        {
+            slashDetector.SetTarget(null);
         }
     }
 
