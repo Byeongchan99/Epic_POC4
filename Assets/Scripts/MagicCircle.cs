@@ -13,6 +13,12 @@ public class MagicCircle : MonoBehaviour
 
     [Header("Pattern")]
     public CirclePattern pattern = CirclePattern.Pentagram;
+    [Tooltip("마법진의 크기 (반지름)")]
+    public float radius = 1.5f;
+
+    [Header("Stage Time Settings")]
+    [Tooltip("이 스테이지의 제한 시간 (0이면 GameManager의 기본 시간 사용)")]
+    public float stageTimeLimit = 0f;
 
     [Header("Visual Feedback")]
     public Color brokenColor = new Color(0.3f, 0.3f, 0.3f, 0.5f); // 끊어진 선분 색상
@@ -128,40 +134,40 @@ public class MagicCircle : MonoBehaviour
         switch (pattern)
         {
             case CirclePattern.Circle:
-                GenerateCircle(1.5f, 32);
+                GenerateCircle(radius, 32);
                 break;
             case CirclePattern.Triangle:
-                GeneratePolygon(1.5f, 3);
+                GeneratePolygon(radius, 3);
                 break;
             case CirclePattern.Square:
-                GeneratePolygon(1.5f, 4);
+                GeneratePolygon(radius, 4);
                 break;
             case CirclePattern.Pentagram:
-                GeneratePentagram(1.5f);
+                GeneratePentagram(radius);
                 break;
             case CirclePattern.Hexagram:
-                GenerateHexagram(1.5f);
+                GenerateHexagram(radius);
                 break;
             case CirclePattern.Heptagram:
-                GenerateStar(1.5f, 7);
+                GenerateStar(radius, 7);
                 break;
             case CirclePattern.Octagram:
-                GenerateStar(1.5f, 8);
+                GenerateStar(radius, 8);
                 break;
             case CirclePattern.Spiral:
-                GenerateSpiral(1.5f, 3);
+                GenerateSpiral(radius, 3);
                 break;
             case CirclePattern.DoublePentagram:
-                GenerateDoublePentagram(1.5f);
+                GenerateDoublePentagram(radius);
                 break;
             case CirclePattern.CrossPattern:
-                GenerateCross(1.5f);
+                GenerateCross(radius);
                 break;
             case CirclePattern.InfinitySymbol:
-                GenerateInfinity(1.2f);
+                GenerateInfinity(radius * 0.8f);  // 무한대는 약간 작게
                 break;
             case CirclePattern.ComplexRune:
-                GenerateComplexRune(1.5f);
+                GenerateComplexRune(radius);
                 break;
         }
 
@@ -786,40 +792,40 @@ public class MagicCircle : MonoBehaviour
         switch (pattern)
         {
             case CirclePattern.Circle:
-                GenerateCirclePreview(points, 1.5f, 32);
+                GenerateCirclePreview(points, radius, 32);
                 break;
             case CirclePattern.Triangle:
-                GeneratePolygonPreview(points, 1.5f, 3);
+                GeneratePolygonPreview(points, radius, 3);
                 break;
             case CirclePattern.Square:
-                GeneratePolygonPreview(points, 1.5f, 4);
+                GeneratePolygonPreview(points, radius, 4);
                 break;
             case CirclePattern.Pentagram:
-                GeneratePentagramPreview(points, 1.5f);
+                GeneratePentagramPreview(points, radius);
                 break;
             case CirclePattern.Hexagram:
-                GenerateHexagramPreview(points, 1.5f);
+                GenerateHexagramPreview(points, radius);
                 break;
             case CirclePattern.Heptagram:
-                GenerateStarPreview(points, 1.5f, 7);
+                GenerateStarPreview(points, radius, 7);
                 break;
             case CirclePattern.Octagram:
-                GenerateStarPreview(points, 1.5f, 8);
+                GenerateStarPreview(points, radius, 8);
                 break;
             case CirclePattern.Spiral:
-                GenerateSpiralPreview(points, 1.5f, 3);
+                GenerateSpiralPreview(points, radius, 3);
                 break;
             case CirclePattern.DoublePentagram:
-                GenerateDoublePentagramPreview(points, 1.5f);
+                GenerateDoublePentagramPreview(points, radius);
                 break;
             case CirclePattern.CrossPattern:
-                GenerateCrossPreview(points, 1.5f);
+                GenerateCrossPreview(points, radius);
                 break;
             case CirclePattern.InfinitySymbol:
-                GenerateInfinityPreview(points, 1.2f);
+                GenerateInfinityPreview(points, radius * 0.8f);
                 break;
             case CirclePattern.ComplexRune:
-                GenerateComplexRunePreview(points, 1.5f);
+                GenerateComplexRunePreview(points, radius);
                 break;
         }
     }
