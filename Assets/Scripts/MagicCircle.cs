@@ -22,6 +22,12 @@ public class MagicCircle : MonoBehaviour
     [Range(0.1f, 0.5f)]
     public float weakpointRatio = 0.3f; // 약점 비율 (전체 선분의 30%)
 
+    [Tooltip("약점 분포 패턴을 선택합니다.")]
+    public WeakpointDistribution weakpointDistribution = WeakpointDistribution.Uniform;
+
+    [Tooltip("Custom 분포를 선택했을 때, 약점으로 지정할 선분 인덱스들 (0부터 시작)")]
+    public int[] customWeakpointIndices;
+
     [Header("Segment Settings")]
     [Tooltip("한 획의 최대 길이. 이보다 길면 자동으로 분할됩니다.")]
     public float maxSegmentLength = 0.3f; // 한 선분의 최대 길이
@@ -31,6 +37,15 @@ public class MagicCircle : MonoBehaviour
     private float drawProgress = 0f;
     private bool isDrawing = false;
     private List<Vector2> patternPoints = new List<Vector2>();
+
+    public enum WeakpointDistribution
+    {
+        Uniform,    // 균등 분산 (기본)
+        Front,      // 앞쪽에 집중
+        Back,       // 뒤쪽에 집중
+        Random,     // 랜덤
+        Custom      // 직접 인덱스 지정
+    }
 
     public enum CirclePattern
     {
@@ -164,15 +179,7 @@ public class MagicCircle : MonoBehaviour
 
         // 약점 지정 (분할된 선분 기준)
         int totalSegments = tempSegments.Count;
-        int weakpointCount = Mathf.Max(1, Mathf.RoundToInt(totalSegments * weakpointRatio));
-
-        // 약점 인덱스 선택 (균등하게 분산)
-        List<int> weakpointIndices = new List<int>();
-        for (int i = 0; i < weakpointCount; i++)
-        {
-            int index = Mathf.FloorToInt((float)i * totalSegments / weakpointCount);
-            weakpointIndices.Add(index);
-        }
+        List<int> weakpointIndices = GetWeakpointIndices(totalSegments);
 
         // 약점 플래그 설정
         for (int i = 0; i < tempSegments.Count; i++)
@@ -180,6 +187,98 @@ public class MagicCircle : MonoBehaviour
             tempSegments[i].isWeakpoint = weakpointIndices.Contains(i);
             segments.Add(tempSegments[i]);
         }
+    }
+
+    /// <summary>
+    /// 약점 인덱스 선택 (분포 패턴에 따라)
+    /// </summary>
+    List<int> GetWeakpointIndices(int totalSegments)
+    {
+        List<int> indices = new List<int>();
+        int weakpointCount = Mathf.Max(1, Mathf.RoundToInt(totalSegments * weakpointRatio));
+
+        switch (weakpointDistribution)
+        {
+            case WeakpointDistribution.Uniform:
+                // 균등 분산
+                for (int i = 0; i < weakpointCount; i++)
+                {
+                    int index = Mathf.FloorToInt((float)i * totalSegments / weakpointCount);
+                    indices.Add(index);
+                }
+                break;
+
+            case WeakpointDistribution.Front:
+                // 앞쪽에 집중 (처음 50% 구간에만 배치)
+                int frontRange = Mathf.Max(1, totalSegments / 2);
+                for (int i = 0; i < weakpointCount; i++)
+                {
+                    int index = Mathf.FloorToInt((float)i * frontRange / weakpointCount);
+                    indices.Add(index);
+                }
+                break;
+
+            case WeakpointDistribution.Back:
+                // 뒤쪽에 집중 (마지막 50% 구간에만 배치)
+                int backStart = totalSegments / 2;
+                int backRange = totalSegments - backStart;
+                for (int i = 0; i < weakpointCount; i++)
+                {
+                    int index = backStart + Mathf.FloorToInt((float)i * backRange / weakpointCount);
+                    indices.Add(index);
+                }
+                break;
+
+            case WeakpointDistribution.Random:
+                // 랜덤 배치
+                System.Random random = new System.Random();
+                HashSet<int> randomIndices = new HashSet<int>();
+                while (randomIndices.Count < weakpointCount)
+                {
+                    int randomIndex = random.Next(0, totalSegments);
+                    randomIndices.Add(randomIndex);
+                }
+                indices.AddRange(randomIndices);
+                break;
+
+            case WeakpointDistribution.Custom:
+                // 직접 지정한 인덱스 사용
+                if (customWeakpointIndices != null && customWeakpointIndices.Length > 0)
+                {
+                    foreach (int customIndex in customWeakpointIndices)
+                    {
+                        // 유효한 인덱스만 추가
+                        if (customIndex >= 0 && customIndex < totalSegments)
+                        {
+                            indices.Add(customIndex);
+                        }
+                    }
+
+                    // Custom 인덱스가 하나도 없으면 Uniform으로 폴백
+                    if (indices.Count == 0)
+                    {
+                        Debug.LogWarning("Custom weakpoint indices are invalid. Falling back to Uniform distribution.");
+                        for (int i = 0; i < weakpointCount; i++)
+                        {
+                            int index = Mathf.FloorToInt((float)i * totalSegments / weakpointCount);
+                            indices.Add(index);
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Custom weakpoint distribution selected but no indices provided. Using Uniform.");
+                    // Custom이지만 인덱스가 없으면 Uniform으로 폴백
+                    for (int i = 0; i < weakpointCount; i++)
+                    {
+                        int index = Mathf.FloorToInt((float)i * totalSegments / weakpointCount);
+                        indices.Add(index);
+                    }
+                }
+                break;
+        }
+
+        return indices;
     }
 
     /// <summary>
@@ -463,12 +562,40 @@ public class MagicCircle : MonoBehaviour
     }
 
     /// <summary>
-    /// 선분을 끊음
+    /// 선분이 완전히 그려졌는지 확인
+    /// </summary>
+    public bool IsSegmentFullyDrawn(int index)
+    {
+        if (index < 0 || index >= lineRenderers.Count)
+            return false;
+
+        // 그리기가 완료되지 않았으면 false
+        if (!IsComplete && isDrawing)
+        {
+            float progress = Mathf.Clamp01(DrawProgress);
+            int segmentsFullyDrawn = Mathf.FloorToInt(lineRenderers.Count * progress);
+
+            // 현재 인덱스가 완전히 그려진 선분 범위에 있는지 확인
+            return index < segmentsFullyDrawn;
+        }
+
+        // 그리기가 완료되었으면 모든 선분이 그려진 것으로 간주
+        return true;
+    }
+
+    /// <summary>
+    /// 선분을 끊음 (그려진 선분만 끊을 수 있음)
     /// </summary>
     public bool BreakSegment(int index)
     {
         if (index >= 0 && index < segments.Count && !segments[index].isBroken)
         {
+            // 그려지지 않은 선분은 자를 수 없음
+            if (!IsSegmentFullyDrawn(index))
+            {
+                return false;
+            }
+
             segments[index].isBroken = true;
 
             // 해당 선분의 LineRenderer 시각적 변경
