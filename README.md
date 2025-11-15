@@ -20,11 +20,12 @@
 - **물리적 감각**: 마우스로 "자르는" 행위 자체가 게임플레이
 - **시각적 피드백**: 끊어지는 순간 파티클 효과 + 카메라 쉐이크
 
-### 📈 난이도 진행
-1. **Stage 1**: 단순한 원형 마법진
-2. **Stage 2**: 오각별 (Pentagram)
-3. **Stage 3**: 육각별 (Hexagram)
-4. **Stage 4+**: 복잡한 룬 마법진
+### 📈 12개 스테이지 시스템
+- **Stage 1-4**: 기본 도형 (Circle, Triangle, Square, Pentagram)
+- **Stage 5-8**: 복잡한 별 (Hexagram, Heptagram, Octagram, DoublePentagram)
+- **Stage 9-12**: 고난이도 패턴 (CrossPattern, Spiral, InfinitySymbol, ComplexRune)
+- **진행 방식**: 클리어 시 다음 스테이지, 실패 시 현재 스테이지 재시작
+- **최종 목표**: 12스테이지 완전 클리어
 
 ### 🎨 시각적 요소
 - 마법진이 **천천히 그려지는** 애니메이션
