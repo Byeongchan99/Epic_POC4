@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Game Settings")]
     public float castTime = 3f;
-    public int cutsNeededToWin = 3;
+    [Tooltip("(Deprecated) 이제 약점 시스템 사용 - MagicCircle의 weakpointRatio 참고")]
+    public int cutsNeededToWin = 3; // 더 이상 사용하지 않음
     public Vector2 spawnPosition = Vector2.zero;
 
     private MagicCircle currentCircle;
@@ -44,8 +45,9 @@ public class GameManager : MonoBehaviour
             OnMagicComplete();
         }
 
-        // 승리 조건 체크
-        if (currentCircle != null && currentCircle.GetBrokenCount() >= cutsNeededToWin)
+        // 승리 조건 체크: 모든 약점을 파괴해야 함
+        if (currentCircle != null &&
+            currentCircle.GetBrokenWeakpointCount() >= currentCircle.GetTotalWeakpointCount())
         {
             OnPlayerWin();
         }
@@ -158,8 +160,9 @@ public class GameManager : MonoBehaviour
 
         if (statusText != null && isGameActive)
         {
-            int cuts = currentCircle != null ? currentCircle.GetBrokenCount() : 0;
-            statusText.text = $"Stage {currentStage} - Cut {cuts}/{cutsNeededToWin} lines!";
+            int brokenWeakpoints = currentCircle != null ? currentCircle.GetBrokenWeakpointCount() : 0;
+            int totalWeakpoints = currentCircle != null ? currentCircle.GetTotalWeakpointCount() : 0;
+            statusText.text = $"Stage {currentStage} - Destroy {brokenWeakpoints}/{totalWeakpoints} weakpoints!";
             statusText.color = Color.white;
         }
     }

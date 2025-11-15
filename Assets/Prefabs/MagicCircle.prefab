@@ -49,3 +49,5 @@ MonoBehaviour:
   lineWidth: 0.1
   pattern: 0
   brokenColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
+  weakpointColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  weakpointRatio: 0.3

@@ -8,11 +8,13 @@ public class LineSegment
     public Vector2 start;
     public Vector2 end;
     public bool isBroken = false;
+    public bool isWeakpoint = false; // 약점 여부
 
-    public LineSegment(Vector2 start, Vector2 end)
+    public LineSegment(Vector2 start, Vector2 end, bool isWeakpoint = false)
     {
         this.start = start;
         this.end = end;
+        this.isWeakpoint = isWeakpoint;
     }
 
     /// <summary>

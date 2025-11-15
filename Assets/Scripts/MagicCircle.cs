@@ -16,6 +16,11 @@ public class MagicCircle : MonoBehaviour
 
     [Header("Visual Feedback")]
     public Color brokenColor = new Color(0.3f, 0.3f, 0.3f, 0.5f); // 끊어진 선분 색상
+    public Color weakpointColor = new Color(1f, 0.3f, 0.3f, 1f); // 약점 선분 색상 (빨간색)
+
+    [Header("Weakpoint Settings")]
+    [Range(0.1f, 0.5f)]
+    public float weakpointRatio = 0.3f; // 약점 비율 (전체 선분의 30%)
 
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private List<LineSegment> segments = new List<LineSegment>();
@@ -64,18 +69,26 @@ public class MagicCircle : MonoBehaviour
         // 각 선분마다 자식 GameObject + LineRenderer 생성
         for (int i = 0; i < segments.Count; i++)
         {
-            GameObject segmentObj = new GameObject($"Segment_{i}");
+            bool isWeakpoint = segments[i].isWeakpoint;
+            GameObject segmentObj = new GameObject($"Segment_{i}" + (isWeakpoint ? "_Weakpoint" : ""));
             segmentObj.transform.parent = transform;
             segmentObj.transform.localPosition = Vector3.zero;
 
             LineRenderer lr = segmentObj.AddComponent<LineRenderer>();
             lr.material = new Material(Shader.Find("Sprites/Default"));
-            lr.startColor = circleColor;
-            lr.endColor = circleColor;
-            lr.startWidth = lineWidth;
-            lr.endWidth = lineWidth;
+
+            // 약점 선분은 다른 색상으로 표시
+            Color segmentColor = isWeakpoint ? weakpointColor : circleColor;
+            lr.startColor = segmentColor;
+            lr.endColor = segmentColor;
+
+            // 약점은 약간 더 두껍게 표시
+            float segmentWidth = isWeakpoint ? lineWidth * 1.5f : lineWidth;
+            lr.startWidth = segmentWidth;
+            lr.endWidth = segmentWidth;
+
             lr.useWorldSpace = true;
-            lr.sortingOrder = 1;
+            lr.sortingOrder = isWeakpoint ? 2 : 1; // 약점을 위에 그리기
             lr.positionCount = 2;
 
             // 선분의 시작점과 끝점 설정
@@ -133,12 +146,26 @@ public class MagicCircle : MonoBehaviour
                 break;
         }
 
-        // 선분 생성
-        for (int i = 0; i < patternPoints.Count - 1; i++)
+        // 선분 생성 및 약점 지정
+        int totalSegments = patternPoints.Count - 1;
+        int weakpointCount = Mathf.Max(1, Mathf.RoundToInt(totalSegments * weakpointRatio));
+
+        // 약점 인덱스 선택 (균등하게 분산)
+        List<int> weakpointIndices = new List<int>();
+        for (int i = 0; i < weakpointCount; i++)
         {
+            int index = Mathf.FloorToInt((float)i * totalSegments / weakpointCount);
+            weakpointIndices.Add(index);
+        }
+
+        // 선분 생성
+        for (int i = 0; i < totalSegments; i++)
+        {
+            bool isWeakpoint = weakpointIndices.Contains(i);
             segments.Add(new LineSegment(
                 patternPoints[i] + (Vector2)transform.position,
-                patternPoints[i + 1] + (Vector2)transform.position
+                patternPoints[i + 1] + (Vector2)transform.position,
+                isWeakpoint
             ));
         }
     }
@@ -451,6 +478,32 @@ public class MagicCircle : MonoBehaviour
         foreach (var seg in segments)
         {
             if (seg.isBroken) count++;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// 끊어진 약점 개수
+    /// </summary>
+    public int GetBrokenWeakpointCount()
+    {
+        int count = 0;
+        foreach (var seg in segments)
+        {
+            if (seg.isWeakpoint && seg.isBroken) count++;
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// 전체 약점 개수
+    /// </summary>
+    public int GetTotalWeakpointCount()
+    {
+        int count = 0;
+        foreach (var seg in segments)
+        {
+            if (seg.isWeakpoint) count++;
         }
         return count;
     }
