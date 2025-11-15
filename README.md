@@ -47,15 +47,23 @@ bool LineIntersects(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
 - **SlashDetector.cs**: 마우스 드래그 감지 및 교차 판정
 - **LineSegment.cs**: 선분 데이터 구조 및 교차 알고리즘
 - **GameManager.cs**: 게임 로직 및 스테이지 관리
-- **GameSetup.cs**: 런타임 자동 세팅 (씬 수정 불필요)
+- **CutEffect.cs**: 마법진 절단 시 파티클 효과
 
 ## 🚀 실행 방법
 
+### 초기 세팅 (최초 1회만)
 1. Unity에서 프로젝트 열기 (Unity 2021.3 이상 권장)
-2. `Scenes/SampleScene.unity` 열기
-3. **Play 버튼 클릭** (자동으로 모든 오브젝트 생성됨)
+2. **[SETUP_GUIDE.md](SETUP_GUIDE.md) 참고하여 씬 세팅**
+   - GameManager, SlashDetector, UI 생성
+   - MagicCircle Prefab 생성
+   - Inspector에서 값 연결
 
-> **자동 실행**: `GameSetup.cs`의 `RuntimeInitializeOnLoadMethod` 덕분에 별도 설정 없이 자동 실행됩니다.
+### 플레이
+1. `Scenes/SampleScene.unity` 열기
+2. **Play 버튼 클릭**
+3. 마우스 드래그로 마법진 자르기!
+
+> **수동 세팅 방식**: Inspector에서 모든 값을 자유롭게 조정할 수 있습니다.
 
 ## 📊 검증 포인트
 
