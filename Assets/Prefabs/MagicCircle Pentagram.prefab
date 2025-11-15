@@ -56,3 +56,5 @@ MonoBehaviour:
   weakpointDistribution: 4
   customWeakpointIndices: 020000000b000000150000001c0000002200000028000000
   maxSegmentLength: 0.7
+  attackPower: 10
+  defensePower: 30
