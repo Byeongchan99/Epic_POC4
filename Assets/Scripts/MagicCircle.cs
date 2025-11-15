@@ -22,10 +22,18 @@ public class MagicCircle : MonoBehaviour
 
     public enum CirclePattern
     {
-        Circle,
-        Pentagram,
-        Hexagram,
-        ComplexRune
+        Circle,          // 원형
+        Triangle,        // 삼각형
+        Square,          // 사각형
+        Pentagram,       // 오각별
+        Hexagram,        // 육각별 (다윗의 별)
+        Heptagram,       // 칠각별
+        Octagram,        // 팔각별
+        Spiral,          // 나선형
+        DoublePentagram, // 이중 오각별
+        CrossPattern,    // 십자가 패턴
+        InfinitySymbol,  // 무한대 기호
+        ComplexRune      // 복잡한 룬
     }
 
     public List<LineSegment> Segments => segments;
@@ -57,13 +65,37 @@ public class MagicCircle : MonoBehaviour
         switch (pattern)
         {
             case CirclePattern.Circle:
-                GenerateCircle(1f, 32);
+                GenerateCircle(1.5f, 32);
+                break;
+            case CirclePattern.Triangle:
+                GeneratePolygon(1.5f, 3);
+                break;
+            case CirclePattern.Square:
+                GeneratePolygon(1.5f, 4);
                 break;
             case CirclePattern.Pentagram:
                 GeneratePentagram(1.5f);
                 break;
             case CirclePattern.Hexagram:
                 GenerateHexagram(1.5f);
+                break;
+            case CirclePattern.Heptagram:
+                GenerateStar(1.5f, 7);
+                break;
+            case CirclePattern.Octagram:
+                GenerateStar(1.5f, 8);
+                break;
+            case CirclePattern.Spiral:
+                GenerateSpiral(1.5f, 3);
+                break;
+            case CirclePattern.DoublePentagram:
+                GenerateDoublePentagram(1.5f);
+                break;
+            case CirclePattern.CrossPattern:
+                GenerateCross(1.5f);
+                break;
+            case CirclePattern.InfinitySymbol:
+                GenerateInfinity(1.2f);
                 break;
             case CirclePattern.ComplexRune:
                 GenerateComplexRune(1.5f);
@@ -145,6 +177,136 @@ public class MagicCircle : MonoBehaviour
             ));
         }
         patternPoints.Add(patternPoints[pointCount]);
+    }
+
+    /// <summary>
+    /// 정다각형 생성 (삼각형, 사각형 등)
+    /// </summary>
+    void GeneratePolygon(float radius, int sides)
+    {
+        for (int i = 0; i <= sides; i++)
+        {
+            float angle = i * Mathf.PI * 2f / sides - Mathf.PI / 2f;
+            patternPoints.Add(new Vector2(
+                Mathf.Cos(angle) * radius,
+                Mathf.Sin(angle) * radius
+            ));
+        }
+    }
+
+    /// <summary>
+    /// N각 별 생성 (한붓그리기 별)
+    /// </summary>
+    void GenerateStar(float radius, int points)
+    {
+        // 한붓그리기 별 (2칸씩 건너뛰며 연결)
+        for (int i = 0; i <= points; i++)
+        {
+            int index = (i * 2) % points;
+            float angle = index * Mathf.PI * 2f / points - Mathf.PI / 2f;
+            patternPoints.Add(new Vector2(
+                Mathf.Cos(angle) * radius,
+                Mathf.Sin(angle) * radius
+            ));
+        }
+    }
+
+    /// <summary>
+    /// 나선형 패턴
+    /// </summary>
+    void GenerateSpiral(float maxRadius, float turns)
+    {
+        int pointCount = 64;
+        for (int i = 0; i <= pointCount; i++)
+        {
+            float t = i / (float)pointCount;
+            float angle = t * Mathf.PI * 2f * turns;
+            float radius = maxRadius * t;
+            patternPoints.Add(new Vector2(
+                Mathf.Cos(angle) * radius,
+                Mathf.Sin(angle) * radius
+            ));
+        }
+    }
+
+    /// <summary>
+    /// 이중 오각별 (크고 작은 별)
+    /// </summary>
+    void GenerateDoublePentagram(float radius)
+    {
+        // 큰 별
+        int[] order = { 0, 2, 4, 1, 3, 0 };
+        foreach (int i in order)
+        {
+            float angle = i * Mathf.PI * 2f / 5f - Mathf.PI / 2f;
+            patternPoints.Add(new Vector2(
+                Mathf.Cos(angle) * radius,
+                Mathf.Sin(angle) * radius
+            ));
+        }
+
+        // 작은 별 (회전)
+        int startPoint = patternPoints.Count;
+        foreach (int i in order)
+        {
+            float angle = i * Mathf.PI * 2f / 5f - Mathf.PI / 2f + Mathf.PI / 5f;
+            patternPoints.Add(new Vector2(
+                Mathf.Cos(angle) * radius * 0.6f,
+                Mathf.Sin(angle) * radius * 0.6f
+            ));
+        }
+        patternPoints.Add(patternPoints[startPoint]);
+    }
+
+    /// <summary>
+    /// 십자가 패턴 (마법진 스타일)
+    /// </summary>
+    void GenerateCross(float size)
+    {
+        // 수평선
+        patternPoints.Add(new Vector2(-size, 0));
+        patternPoints.Add(new Vector2(size, 0));
+        patternPoints.Add(new Vector2(0, 0));
+
+        // 수직선
+        patternPoints.Add(new Vector2(0, size));
+        patternPoints.Add(new Vector2(0, -size));
+        patternPoints.Add(new Vector2(0, 0));
+
+        // 대각선 1
+        patternPoints.Add(new Vector2(-size * 0.7f, size * 0.7f));
+        patternPoints.Add(new Vector2(size * 0.7f, -size * 0.7f));
+        patternPoints.Add(new Vector2(0, 0));
+
+        // 대각선 2
+        patternPoints.Add(new Vector2(size * 0.7f, size * 0.7f));
+        patternPoints.Add(new Vector2(-size * 0.7f, -size * 0.7f));
+
+        // 외곽 원
+        int circleStart = patternPoints.Count;
+        for (int i = 0; i <= 32; i++)
+        {
+            float angle = i * Mathf.PI * 2f / 32;
+            patternPoints.Add(new Vector2(
+                Mathf.Cos(angle) * size,
+                Mathf.Sin(angle) * size
+            ));
+        }
+    }
+
+    /// <summary>
+    /// 무한대 기호 (∞)
+    /// </summary>
+    void GenerateInfinity(float size)
+    {
+        int pointCount = 64;
+        for (int i = 0; i <= pointCount; i++)
+        {
+            float t = i / (float)pointCount * Mathf.PI * 2f;
+            float x = Mathf.Sin(t) * size;
+            float y = Mathf.Sin(t) * Mathf.Cos(t) * size * 0.5f;
+            patternPoints.Add(new Vector2(x, y));
+        }
     }
 
     public void StartDrawing()
