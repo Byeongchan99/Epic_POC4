@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8877665544332211002}
   - component: {fileID: 8877665544332211003}
   m_Layer: 0
-  m_Name: MagicCircle
+  m_Name: MagicCircle 7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   drawDuration: 3
   circleColor: {r: 0.5, g: 0.2, b: 1, a: 1}
   lineWidth: 0.1
-  pattern: 0
+  pattern: 7
   brokenColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
   weakpointColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   weakpointRatio: 0.1
