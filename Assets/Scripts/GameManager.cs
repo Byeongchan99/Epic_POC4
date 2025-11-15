@@ -20,7 +20,25 @@ public class GameManager : MonoBehaviour
     public int cutsNeededToWin = 3; // 더 이상 사용하지 않음
     public Vector2 spawnPosition = Vector2.zero;
 
-    private const int TOTAL_STAGES = 12; // 전체 스테이지 개수
+    [Header("Stage Settings")]
+    [Tooltip("각 스테이지의 패턴을 설정합니다. 비어있으면 기본 순서를 사용합니다.")]
+    public MagicCircle.CirclePattern[] stagePatterns = new MagicCircle.CirclePattern[]
+    {
+        MagicCircle.CirclePattern.Circle,
+        MagicCircle.CirclePattern.Triangle,
+        MagicCircle.CirclePattern.Square,
+        MagicCircle.CirclePattern.Pentagram,
+        MagicCircle.CirclePattern.Hexagram,
+        MagicCircle.CirclePattern.Heptagram,
+        MagicCircle.CirclePattern.Octagram,
+        MagicCircle.CirclePattern.DoublePentagram,
+        MagicCircle.CirclePattern.CrossPattern,
+        MagicCircle.CirclePattern.Spiral,
+        MagicCircle.CirclePattern.InfinitySymbol,
+        MagicCircle.CirclePattern.ComplexRune
+    };
+
+    private int TotalStages => stagePatterns != null && stagePatterns.Length > 0 ? stagePatterns.Length : 12;
     private MagicCircle currentCircle;
     private float remainingTime;
     private int currentStage = 0;
@@ -86,21 +104,16 @@ public class GameManager : MonoBehaviour
 
     MagicCircle.CirclePattern GetPatternForStage(int stage)
     {
-        switch (stage)
+        // 스테이지는 1부터 시작하므로 배열 인덱스는 stage - 1
+        int index = stage - 1;
+
+        if (stagePatterns != null && index >= 0 && index < stagePatterns.Length)
         {
-            case 1: return MagicCircle.CirclePattern.Circle;
-            case 2: return MagicCircle.CirclePattern.Triangle;
-            case 3: return MagicCircle.CirclePattern.Square;
-            case 4: return MagicCircle.CirclePattern.Pentagram;
-            case 5: return MagicCircle.CirclePattern.Hexagram;
-            case 6: return MagicCircle.CirclePattern.Heptagram;
-            case 7: return MagicCircle.CirclePattern.Octagram;
-            case 8: return MagicCircle.CirclePattern.DoublePentagram;
-            case 9: return MagicCircle.CirclePattern.CrossPattern;
-            case 10: return MagicCircle.CirclePattern.Spiral;
-            case 11: return MagicCircle.CirclePattern.InfinitySymbol;
-            default: return MagicCircle.CirclePattern.ComplexRune;
+            return stagePatterns[index];
         }
+
+        // 기본값 (배열이 없거나 범위를 벗어나면)
+        return MagicCircle.CirclePattern.Circle;
     }
 
     void OnPlayerWin()
@@ -121,7 +134,7 @@ public class GameManager : MonoBehaviour
         currentCircle.Destroy();
 
         // 전체 스테이지 클리어 체크
-        if (currentStage >= TOTAL_STAGES)
+        if (currentStage >= TotalStages)
         {
             Invoke(nameof(OnGameComplete), 2f);
         }
@@ -207,7 +220,7 @@ public class GameManager : MonoBehaviour
         {
             int brokenWeakpoints = currentCircle != null ? currentCircle.GetBrokenWeakpointCount() : 0;
             int totalWeakpoints = currentCircle != null ? currentCircle.GetTotalWeakpointCount() : 0;
-            statusText.text = $"Stage {currentStage}/{TOTAL_STAGES} - Destroy {brokenWeakpoints}/{totalWeakpoints} weakpoints!";
+            statusText.text = $"Stage {currentStage}/{TotalStages} - Destroy {brokenWeakpoints}/{totalWeakpoints} weakpoints!";
             statusText.color = Color.white;
             statusText.fontSize = 32; // 기본 크기로 복원
         }

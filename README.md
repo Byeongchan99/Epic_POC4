@@ -20,12 +20,12 @@
 - **물리적 감각**: 마우스로 "자르는" 행위 자체가 게임플레이
 - **시각적 피드백**: 끊어지는 순간 파티클 효과 + 카메라 쉐이크
 
-### 📈 12개 스테이지 시스템
-- **Stage 1-4**: 기본 도형 (Circle, Triangle, Square, Pentagram)
-- **Stage 5-8**: 복잡한 별 (Hexagram, Heptagram, Octagram, DoublePentagram)
-- **Stage 9-12**: 고난이도 패턴 (CrossPattern, Spiral, InfinitySymbol, ComplexRune)
+### 📈 커스터마이징 가능한 스테이지 시스템
+- **기본 12개 스테이지**: Circle → Triangle → Square → ... → ComplexRune
+- **Inspector에서 자유롭게 변경 가능**: 스테이지 개수, 패턴 순서 완전 커스터마이징
 - **진행 방식**: 클리어 시 다음 스테이지, 실패 시 현재 스테이지 재시작
-- **최종 목표**: 12스테이지 완전 클리어
+- **유연한 난이도 조절**: 3개 스테이지부터 30개 이상까지 자유롭게 설정
+- **상세 가이드**: [STAGE_CUSTOMIZATION.md](STAGE_CUSTOMIZATION.md) 참고
 
 ### 🎨 시각적 요소
 - 마법진이 **천천히 그려지는** 애니메이션
@@ -65,6 +65,12 @@ bool LineIntersects(Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4)
 1. `Scenes/SampleScene.unity` 열기
 2. **Play 버튼 클릭**
 3. 마우스 드래그로 마법진 자르기!
+
+### 스테이지 커스터마이징 (선택)
+1. Hierarchy에서 **GameManager** 선택
+2. Inspector > **Stage Settings** > **Stage Patterns** 배열 수정
+3. 원하는 패턴으로 순서 변경 또는 스테이지 개수 조절
+4. 자세한 내용은 **[STAGE_CUSTOMIZATION.md](STAGE_CUSTOMIZATION.md)** 참고
 
 > **수동 세팅 방식**: Inspector에서 모든 값을 자유롭게 조정할 수 있습니다.
 
