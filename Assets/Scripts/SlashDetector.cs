@@ -76,7 +76,11 @@ public class SlashDetector : MonoBehaviour
         laserPointer.startWidth = laserSize;
         laserPointer.endWidth = laserSize;
         laserPointer.useWorldSpace = false; // Local space로 변경하여 transform 이동 가능하게
-        laserPointer.sortingLayerName = "UI"; // UI 레이어에 렌더링
+        // UI 레이어가 있으면 사용, 없으면 Default 레이어 사용
+        if (SortingLayer.IsValid(SortingLayer.NameToID("UI")))
+        {
+            laserPointer.sortingLayerName = "UI";
+        }
         laserPointer.sortingOrder = 1000; // UI 위에 그리기
         laserPointer.loop = true;
 
