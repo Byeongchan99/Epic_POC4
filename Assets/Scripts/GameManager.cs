@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// 게임 전체 로직 관리
@@ -9,9 +10,9 @@ public class GameManager : MonoBehaviour
     [Header("References")]
     public MagicCircle magicCirclePrefab;
     public SlashDetector slashDetector;
-    public Text statusText;
-    public Text timerText;
-    public Text scoreText;
+    public TextMeshProUGUI statusText;
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI scoreText;
 
     [Header("Game Settings")]
     public float castTime = 3f;
