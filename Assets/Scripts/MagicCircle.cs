@@ -22,6 +22,10 @@ public class MagicCircle : MonoBehaviour
     [Range(0.1f, 0.5f)]
     public float weakpointRatio = 0.3f; // 약점 비율 (전체 선분의 30%)
 
+    [Header("Segment Settings")]
+    [Tooltip("한 획의 최대 길이. 이보다 길면 자동으로 분할됩니다.")]
+    public float maxSegmentLength = 0.3f; // 한 선분의 최대 길이
+
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private List<LineSegment> segments = new List<LineSegment>();
     private float drawProgress = 0f;
@@ -146,8 +150,20 @@ public class MagicCircle : MonoBehaviour
                 break;
         }
 
-        // 선분 생성 및 약점 지정
-        int totalSegments = patternPoints.Count - 1;
+        // 선분 생성 (긴 선분은 짧게 분할)
+        List<LineSegment> tempSegments = new List<LineSegment>();
+        for (int i = 0; i < patternPoints.Count - 1; i++)
+        {
+            Vector2 start = patternPoints[i] + (Vector2)transform.position;
+            Vector2 end = patternPoints[i + 1] + (Vector2)transform.position;
+
+            // 긴 선분을 짧게 분할
+            List<LineSegment> subdivided = SubdivideSegment(start, end, maxSegmentLength);
+            tempSegments.AddRange(subdivided);
+        }
+
+        // 약점 지정 (분할된 선분 기준)
+        int totalSegments = tempSegments.Count;
         int weakpointCount = Mathf.Max(1, Mathf.RoundToInt(totalSegments * weakpointRatio));
 
         // 약점 인덱스 선택 (균등하게 분산)
@@ -158,16 +174,45 @@ public class MagicCircle : MonoBehaviour
             weakpointIndices.Add(index);
         }
 
-        // 선분 생성
-        for (int i = 0; i < totalSegments; i++)
+        // 약점 플래그 설정
+        for (int i = 0; i < tempSegments.Count; i++)
         {
-            bool isWeakpoint = weakpointIndices.Contains(i);
-            segments.Add(new LineSegment(
-                patternPoints[i] + (Vector2)transform.position,
-                patternPoints[i + 1] + (Vector2)transform.position,
-                isWeakpoint
-            ));
+            tempSegments[i].isWeakpoint = weakpointIndices.Contains(i);
+            segments.Add(tempSegments[i]);
         }
+    }
+
+    /// <summary>
+    /// 긴 선분을 짧은 세그먼트로 분할
+    /// </summary>
+    List<LineSegment> SubdivideSegment(Vector2 start, Vector2 end, float maxLength)
+    {
+        List<LineSegment> result = new List<LineSegment>();
+        float totalLength = Vector2.Distance(start, end);
+
+        // 선분이 충분히 짧으면 그대로 반환
+        if (totalLength <= maxLength)
+        {
+            result.Add(new LineSegment(start, end, false));
+            return result;
+        }
+
+        // 필요한 분할 개수 계산
+        int subdivisions = Mathf.CeilToInt(totalLength / maxLength);
+
+        // 균등하게 분할
+        for (int i = 0; i < subdivisions; i++)
+        {
+            float t1 = (float)i / subdivisions;
+            float t2 = (float)(i + 1) / subdivisions;
+
+            Vector2 segmentStart = Vector2.Lerp(start, end, t1);
+            Vector2 segmentEnd = Vector2.Lerp(start, end, t2);
+
+            result.Add(new LineSegment(segmentStart, segmentEnd, false));
+        }
+
+        return result;
     }
 
     void GenerateCircle(float radius, int points)
@@ -506,6 +551,22 @@ public class MagicCircle : MonoBehaviour
             if (seg.isWeakpoint) count++;
         }
         return count;
+    }
+
+    /// <summary>
+    /// 일반 선분(보라색)이 잘렸는지 확인
+    /// </summary>
+    public bool HasBrokenNormalSegment()
+    {
+        foreach (var seg in segments)
+        {
+            // 약점이 아닌데 끊어진 선분이 있으면 true
+            if (!seg.isWeakpoint && seg.isBroken)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>

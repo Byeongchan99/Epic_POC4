@@ -45,13 +45,21 @@ public class GameManager : MonoBehaviour
         remainingTime -= Time.deltaTime;
         UpdateUI();
 
-        // 시간 초과
+        // 실패 조건 1: 보라색 선분(일반 선분)을 자른 경우
+        if (currentCircle != null && currentCircle.HasBrokenNormalSegment())
+        {
+            OnPlayerFail();
+            return;
+        }
+
+        // 실패 조건 2: 시간 초과
         if (remainingTime <= 0)
         {
             OnMagicComplete();
+            return;
         }
 
-        // 승리 조건 체크: 모든 약점을 파괴해야 함
+        // 승리 조건: 모든 약점을 파괴 + 일반 선분은 건드리지 않음
         if (currentCircle != null &&
             currentCircle.GetBrokenWeakpointCount() >= currentCircle.GetTotalWeakpointCount())
         {
@@ -146,13 +154,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void OnPlayerFail()
+    {
+        isGameActive = false;
+
+        if (statusText != null)
+        {
+            statusText.text = $"WRONG CUT! Don't cut purple lines!";
+            statusText.color = Color.red;
+        }
+
+        Debug.Log($"Stage {currentStage} failed! Cut normal segment (purple).");
+
+        // 현재 스테이지 재시작
+        Invoke(nameof(RestartStage), 2f);
+    }
+
     void OnMagicComplete()
     {
         isGameActive = false;
 
         if (statusText != null)
         {
-            statusText.text = $"STAGE {currentStage} FAILED! Retry...";
+            statusText.text = $"TIME UP! Retry...";
             statusText.color = Color.red;
         }
 
