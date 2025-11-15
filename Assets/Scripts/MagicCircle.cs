@@ -38,6 +38,12 @@ public class MagicCircle : MonoBehaviour
     [Tooltip("한 획의 최대 길이. 이보다 길면 자동으로 분할됩니다.")]
     public float maxSegmentLength = 0.3f; // 한 선분의 최대 길이
 
+    [Header("Battle Stats")]
+    [Tooltip("공격 마법으로 사용될 때의 공격력")]
+    public int attackPower = 10;
+    [Tooltip("방어 마법으로 사용될 때의 방어도")]
+    public int defensePower = 10;
+
     private List<LineRenderer> lineRenderers = new List<LineRenderer>();
     private List<LineSegment> segments = new List<LineSegment>();
     private float drawProgress = 0f;
