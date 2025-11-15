@@ -71,7 +71,6 @@ public class GameManager : MonoBehaviour
     {
         currentStage++;
         isGameActive = true;
-        remainingTime = castTime;
 
         // 이전 마법진 제거
         if (currentCircle != null)
@@ -91,9 +90,18 @@ public class GameManager : MonoBehaviour
         // 새 마법진 생성 (프리팹의 모든 설정 그대로 사용)
         currentCircle = Instantiate(prefabToUse, spawnPosition, Quaternion.identity);
 
-        // drawDuration만 GameManager의 castTime으로 오버라이드
-        currentCircle.drawDuration = castTime;
+        // 그리기 시작 (프리팹의 drawDuration 사용)
         currentCircle.StartDrawing();
+
+        // 스테이지 제한 시간 설정 (프리팹의 stageTimeLimit 또는 기본 castTime)
+        if (currentCircle.stageTimeLimit > 0)
+        {
+            remainingTime = currentCircle.stageTimeLimit;
+        }
+        else
+        {
+            remainingTime = castTime; // 기본값 사용
+        }
 
         // SlashDetector에 타겟 설정
         if (slashDetector != null)
@@ -102,7 +110,7 @@ public class GameManager : MonoBehaviour
         }
 
         UpdateUI();
-        Debug.Log($"Stage {currentStage} started with prefab: {prefabToUse.name}");
+        Debug.Log($"Stage {currentStage} started with prefab: {prefabToUse.name}, drawDuration: {currentCircle.drawDuration}s, stageTime: {remainingTime}s");
     }
 
     MagicCircle GetPrefabForStage(int stage)
