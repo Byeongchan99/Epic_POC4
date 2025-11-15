@@ -146,7 +146,7 @@ public class MagicCircle : MonoBehaviour
                 GeneratePentagram(radius);
                 break;
             case CirclePattern.Hexagram:
-                GenerateStar(radius, 6, 2); // 6각별, 2칸씩 건너뛰기
+                GenerateStar(radius, 12, 5); // 12개 점으로 6각별 모양 (5칸씩 건너뛰기)
                 break;
             case CirclePattern.Heptagram:
                 GenerateStar(radius, 7, 2); // 7각별, 2칸씩 건너뛰기
@@ -804,7 +804,7 @@ public class MagicCircle : MonoBehaviour
                 GeneratePentagramPreview(points, radius);
                 break;
             case CirclePattern.Hexagram:
-                GenerateStarPreview(points, radius, 6, 2); // 6각별, 2칸씩 건너뛰기
+                GenerateStarPreview(points, radius, 12, 5); // 12개 점으로 6각별 모양 (5칸씩 건너뛰기)
                 break;
             case CirclePattern.Heptagram:
                 GenerateStarPreview(points, radius, 7, 2); // 7각별, 2칸씩 건너뛰기
