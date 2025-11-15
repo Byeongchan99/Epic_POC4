@@ -703,4 +703,251 @@ public class MagicCircle : MonoBehaviour
     {
         Destroy(gameObject, 0.5f);
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Editor에서 약점 위치 미리보기 (Scene 뷰에서만 표시)
+    /// </summary>
+    void OnDrawGizmosSelected()
+    {
+        // Play 모드가 아닐 때만 미리보기 표시
+        if (UnityEngine.Application.isPlaying) return;
+
+        // 임시로 패턴 생성
+        List<Vector2> previewPoints = new List<Vector2>();
+        GeneratePatternPreview(previewPoints);
+
+        if (previewPoints.Count < 2) return;
+
+        // 임시 선분 생성 (분할 포함)
+        List<LineSegment> previewSegments = new List<LineSegment>();
+        for (int i = 0; i < previewPoints.Count - 1; i++)
+        {
+            Vector2 start = previewPoints[i] + (Vector2)transform.position;
+            Vector2 end = previewPoints[i + 1] + (Vector2)transform.position;
+
+            List<LineSegment> subdivided = SubdivideSegment(start, end, maxSegmentLength);
+            previewSegments.AddRange(subdivided);
+        }
+
+        // 약점 인덱스 계산
+        List<int> weakpointIndices = GetWeakpointIndices(previewSegments.Count);
+
+        // 선분 그리기
+        for (int i = 0; i < previewSegments.Count; i++)
+        {
+            bool isWeakpoint = weakpointIndices.Contains(i);
+
+            // 색상 설정
+            if (isWeakpoint)
+            {
+                UnityEditor.Handles.color = weakpointColor;
+            }
+            else
+            {
+                UnityEditor.Handles.color = circleColor;
+            }
+
+            // 선 두께 설정
+            float thickness = isWeakpoint ? lineWidth * 1.5f : lineWidth;
+            UnityEditor.Handles.DrawAAPolyLine(thickness * 10f, previewSegments[i].start, previewSegments[i].end);
+
+            // 약점 인덱스 표시
+            if (isWeakpoint)
+            {
+                Vector2 midPoint = (previewSegments[i].start + previewSegments[i].end) / 2f;
+                UnityEditor.Handles.Label(midPoint, $"#{i}", new UnityEngine.GUIStyle()
+                {
+                    normal = new UnityEngine.GUIStyleState() { textColor = Color.red },
+                    fontSize = 12,
+                    fontStyle = UnityEngine.FontStyle.Bold
+                });
+            }
+        }
+
+        // 전체 선분 개수 표시
+        Vector3 labelPos = transform.position + Vector3.up * 3f;
+        UnityEditor.Handles.Label(labelPos,
+            $"Total Segments: {previewSegments.Count}\nWeakpoints: {weakpointIndices.Count}",
+            new UnityEngine.GUIStyle()
+            {
+                normal = new UnityEngine.GUIStyleState() { textColor = Color.white },
+                fontSize = 14,
+                fontStyle = UnityEngine.FontStyle.Bold,
+                alignment = UnityEngine.TextAnchor.MiddleCenter
+            });
+    }
+
+    /// <summary>
+    /// 미리보기용 패턴 생성 (GeneratePattern과 동일하지만 별도 리스트 사용)
+    /// </summary>
+    void GeneratePatternPreview(List<Vector2> points)
+    {
+        switch (pattern)
+        {
+            case CirclePattern.Circle:
+                GenerateCirclePreview(points, 1.5f, 32);
+                break;
+            case CirclePattern.Triangle:
+                GeneratePolygonPreview(points, 1.5f, 3);
+                break;
+            case CirclePattern.Square:
+                GeneratePolygonPreview(points, 1.5f, 4);
+                break;
+            case CirclePattern.Pentagram:
+                GeneratePentagramPreview(points, 1.5f);
+                break;
+            case CirclePattern.Hexagram:
+                GenerateHexagramPreview(points, 1.5f);
+                break;
+            case CirclePattern.Heptagram:
+                GenerateStarPreview(points, 1.5f, 7);
+                break;
+            case CirclePattern.Octagram:
+                GenerateStarPreview(points, 1.5f, 8);
+                break;
+            case CirclePattern.Spiral:
+                GenerateSpiralPreview(points, 1.5f, 3);
+                break;
+            case CirclePattern.DoublePentagram:
+                GenerateDoublePentagramPreview(points, 1.5f);
+                break;
+            case CirclePattern.CrossPattern:
+                GenerateCrossPreview(points, 1.5f);
+                break;
+            case CirclePattern.InfinitySymbol:
+                GenerateInfinityPreview(points, 1.2f);
+                break;
+            case CirclePattern.ComplexRune:
+                GenerateComplexRunePreview(points, 1.5f);
+                break;
+        }
+    }
+
+    void GenerateCirclePreview(List<Vector2> points, float radius, int segments)
+    {
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = i * Mathf.PI * 2f / segments;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
+        }
+    }
+
+    void GeneratePolygonPreview(List<Vector2> points, float radius, int sides)
+    {
+        for (int i = 0; i <= sides; i++)
+        {
+            float angle = i * Mathf.PI * 2f / sides - Mathf.PI / 2f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
+        }
+    }
+
+    void GeneratePentagramPreview(List<Vector2> points, float radius)
+    {
+        int[] order = { 0, 2, 4, 1, 3, 0 };
+        foreach (int i in order)
+        {
+            float angle = i * Mathf.PI * 2f / 5f - Mathf.PI / 2f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
+        }
+    }
+
+    void GenerateHexagramPreview(List<Vector2> points, float radius)
+    {
+        for (int i = 0; i <= 6; i++)
+        {
+            float angle = i * Mathf.PI * 2f / 6f - Mathf.PI / 2f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
+        }
+        for (int i = 0; i <= 6; i++)
+        {
+            float angle = i * Mathf.PI * 2f / 6f - Mathf.PI / 2f + Mathf.PI / 3f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
+        }
+    }
+
+    void GenerateStarPreview(List<Vector2> points, float radius, int starPoints)
+    {
+        for (int i = 0; i <= starPoints; i++)
+        {
+            int index = (i * 2) % starPoints;
+            float angle = index * Mathf.PI * 2f / starPoints - Mathf.PI / 2f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
+        }
+    }
+
+    void GenerateSpiralPreview(List<Vector2> points, float maxRadius, float turns)
+    {
+        int pointCount = 64;
+        for (int i = 0; i <= pointCount; i++)
+        {
+            float t = i / (float)pointCount;
+            float angle = t * Mathf.PI * 2f * turns;
+            float r = maxRadius * t;
+            points.Add(new Vector2(Mathf.Cos(angle) * r, Mathf.Sin(angle) * r));
+        }
+    }
+
+    void GenerateDoublePentagramPreview(List<Vector2> points, float radius)
+    {
+        int[] order = { 0, 2, 4, 1, 3, 0 };
+        foreach (int i in order)
+        {
+            float angle = i * Mathf.PI * 2f / 5f - Mathf.PI / 2f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
+        }
+        int startPoint = points.Count;
+        foreach (int i in order)
+        {
+            float angle = i * Mathf.PI * 2f / 5f - Mathf.PI / 2f + Mathf.PI / 5f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius * 0.6f, Mathf.Sin(angle) * radius * 0.6f));
+        }
+        points.Add(points[startPoint]);
+    }
+
+    void GenerateCrossPreview(List<Vector2> points, float size)
+    {
+        points.Add(new Vector2(-size, 0));
+        points.Add(new Vector2(size, 0));
+        points.Add(new Vector2(0, 0));
+        points.Add(new Vector2(0, size));
+        points.Add(new Vector2(0, -size));
+        points.Add(new Vector2(0, 0));
+        points.Add(new Vector2(-size * 0.7f, size * 0.7f));
+        points.Add(new Vector2(size * 0.7f, -size * 0.7f));
+        points.Add(new Vector2(0, 0));
+        points.Add(new Vector2(size * 0.7f, size * 0.7f));
+        points.Add(new Vector2(-size * 0.7f, -size * 0.7f));
+        int circleStart = points.Count;
+        for (int i = 0; i <= 32; i++)
+        {
+            float angle = i * Mathf.PI * 2f / 32;
+            points.Add(new Vector2(Mathf.Cos(angle) * size, Mathf.Sin(angle) * size));
+        }
+    }
+
+    void GenerateInfinityPreview(List<Vector2> points, float size)
+    {
+        int pointCount = 64;
+        for (int i = 0; i <= pointCount; i++)
+        {
+            float t = i / (float)pointCount * Mathf.PI * 2f;
+            float x = Mathf.Sin(t) * size;
+            float y = Mathf.Sin(t) * Mathf.Cos(t) * size * 0.5f;
+            points.Add(new Vector2(x, y));
+        }
+    }
+
+    void GenerateComplexRunePreview(List<Vector2> points, float radius)
+    {
+        GenerateCirclePreview(points, radius, 24);
+        int pointCount = points.Count;
+        for (int i = 0; i < 8; i++)
+        {
+            float angle = i * Mathf.PI * 2f / 8f;
+            points.Add(new Vector2(Mathf.Cos(angle) * radius * 0.5f, Mathf.Sin(angle) * radius * 0.5f));
+        }
+        points.Add(points[pointCount]);
+    }
+#endif
 }

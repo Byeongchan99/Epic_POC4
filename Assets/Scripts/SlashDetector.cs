@@ -132,19 +132,28 @@ public class SlashDetector : MonoBehaviour
 
             if (LineSegment.Intersects(slashStart, slashEnd, segments[i].start, segments[i].end))
             {
-                // 선분 끊기
-                currentTarget.BreakSegment(i);
+                // 선분 끊기 시도 (그려진 선분만 잘림)
+                bool wasCut = currentTarget.BreakSegment(i);
 
-                // 교차점 계산
-                Vector2 intersectionPoint = LineSegment.GetIntersectionPoint(
-                    slashStart, slashEnd,
-                    segments[i].start, segments[i].end
-                );
+                // 실제로 잘렸을 때만 이펙트 생성
+                if (wasCut)
+                {
+                    // 교차점 계산
+                    Vector2 intersectionPoint = LineSegment.GetIntersectionPoint(
+                        slashStart, slashEnd,
+                        segments[i].start, segments[i].end
+                    );
 
-                // 효과 생성
-                SpawnCutEffect(intersectionPoint);
+                    // 효과 생성
+                    SpawnCutEffect(intersectionPoint);
 
-                Debug.Log($"Cut! Segment {i} at {intersectionPoint}");
+                    Debug.Log($"Cut! Segment {i} at {intersectionPoint}");
+                }
+                else
+                {
+                    // 그려지지 않은 선분을 잘라려고 시도
+                    Debug.Log($"Cannot cut segment {i} - not fully drawn yet");
+                }
             }
         }
     }
