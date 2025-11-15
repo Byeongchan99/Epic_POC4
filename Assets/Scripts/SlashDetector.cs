@@ -75,11 +75,11 @@ public class SlashDetector : MonoBehaviour
         laserPointer.endColor = laserColor;
         laserPointer.startWidth = laserSize;
         laserPointer.endWidth = laserSize;
-        laserPointer.useWorldSpace = true;
+        laserPointer.useWorldSpace = false; // Local space로 변경하여 transform 이동 가능하게
         laserPointer.sortingOrder = 100; // 가장 위에 그리기
         laserPointer.loop = true;
 
-        // 작은 원형 생성 (8개 점으로 원 만들기)
+        // 작은 원형 생성 (12개 점으로 원 만들기)
         int segments = 12;
         laserPointer.positionCount = segments;
 
