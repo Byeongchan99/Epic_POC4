@@ -146,13 +146,13 @@ public class MagicCircle : MonoBehaviour
                 GeneratePentagram(radius);
                 break;
             case CirclePattern.Hexagram:
-                GenerateHexagram(radius);
+                GenerateStar(radius, 6, 2); // 6각별, 2칸씩 건너뛰기
                 break;
             case CirclePattern.Heptagram:
-                GenerateStar(radius, 7);
+                GenerateStar(radius, 7, 2); // 7각별, 2칸씩 건너뛰기
                 break;
             case CirclePattern.Octagram:
-                GenerateStar(radius, 8);
+                GenerateStar(radius, 8, 3); // 8각별, 3칸씩 건너뛰기
                 break;
             case CirclePattern.Spiral:
                 GenerateSpiral(radius, 3);
@@ -405,12 +405,12 @@ public class MagicCircle : MonoBehaviour
     /// <summary>
     /// N각 별 생성 (한붓그리기 별)
     /// </summary>
-    void GenerateStar(float radius, int points)
+    void GenerateStar(float radius, int points, int skip = 2)
     {
-        // 한붓그리기 별 (2칸씩 건너뛰며 연결)
+        // 한붓그리기 별 (skip칸씩 건너뛰며 연결)
         for (int i = 0; i <= points; i++)
         {
-            int index = (i * 2) % points;
+            int index = (i * skip) % points;
             float angle = index * Mathf.PI * 2f / points - Mathf.PI / 2f;
             patternPoints.Add(new Vector2(
                 Mathf.Cos(angle) * radius,
@@ -804,13 +804,13 @@ public class MagicCircle : MonoBehaviour
                 GeneratePentagramPreview(points, radius);
                 break;
             case CirclePattern.Hexagram:
-                GenerateHexagramPreview(points, radius);
+                GenerateStarPreview(points, radius, 6, 2); // 6각별, 2칸씩 건너뛰기
                 break;
             case CirclePattern.Heptagram:
-                GenerateStarPreview(points, radius, 7);
+                GenerateStarPreview(points, radius, 7, 2); // 7각별, 2칸씩 건너뛰기
                 break;
             case CirclePattern.Octagram:
-                GenerateStarPreview(points, radius, 8);
+                GenerateStarPreview(points, radius, 8, 3); // 8각별, 3칸씩 건너뛰기
                 break;
             case CirclePattern.Spiral:
                 GenerateSpiralPreview(points, radius, 3);
@@ -872,11 +872,11 @@ public class MagicCircle : MonoBehaviour
         }
     }
 
-    void GenerateStarPreview(List<Vector2> points, float radius, int starPoints)
+    void GenerateStarPreview(List<Vector2> points, float radius, int starPoints, int skip = 2)
     {
         for (int i = 0; i <= starPoints; i++)
         {
-            int index = (i * 2) % starPoints;
+            int index = (i * skip) % starPoints;
             float angle = index * Mathf.PI * 2f / starPoints - Mathf.PI / 2f;
             points.Add(new Vector2(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius));
         }
