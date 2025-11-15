@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8877665544332211002}
   - component: {fileID: 8877665544332211003}
   m_Layer: 0
-  m_Name: MagicCircle 9
+  m_Name: MagicCircle Spiral
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,10 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawDuration: 3
+  drawDuration: 8
   circleColor: {r: 0.5, g: 0.2, b: 1, a: 1}
   lineWidth: 0.1
-  pattern: 9
+  pattern: 7
   brokenColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
   weakpointColor: {r: 1, g: 0.3, b: 0.3, a: 1}
-  weakpointRatio: 0.1
+  weakpointRatio: 0.2
+  weakpointDistribution: 0
+  customWeakpointIndices: 
+  maxSegmentLength: 0.3
